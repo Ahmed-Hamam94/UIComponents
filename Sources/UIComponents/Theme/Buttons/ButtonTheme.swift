@@ -19,9 +19,9 @@ public protocol ButtonThemeProtocol {
 public struct ButtonTheme: ButtonThemeProtocol {
     public var backgroundColor: Color
     public var disabledBackgroundColor: Color
-    public var foregroundColor: Color = .white
-    public var cornerRadius: CGFloat = 6.0
-    public var height: CGFloat = 48
+    public var foregroundColor: Color
+    public var cornerRadius: CGFloat
+    public var height: CGFloat
     public var font: Font
     
     public init(backgroundColor: Color = .blue, disabledBackgroundColor: Color? = nil, foregroundColor: Color = .white, cornerRadius: CGFloat = 6.0, height: CGFloat = 48, font: Font = .body) {
