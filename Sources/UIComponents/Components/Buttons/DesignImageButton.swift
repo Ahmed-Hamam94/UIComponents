@@ -8,11 +8,6 @@
 import SwiftUI
 
 public struct DesignImageButton: View {
-    public enum ImagePosition {
-        case leading
-        case trailing
-    }
-    
     var title: String?
     var image: String
     var imagePosition: ImagePosition
