@@ -7,17 +7,40 @@
 
 import SwiftUI
 
-public struct DesignImageButton: View {
-    var title: String?
-    var image: String
-    var imagePosition: ImagePosition
-    var spacing: CGFloat
-    var style: ButtonThemeProtocol
-    var action: () -> Void
+public struct DesignImageButton<S: ButtonThemeProtocol>: View {
+    private let title: String?
+    private let image: String
+    private let imagePosition: ImagePosition
+    private let spacing: CGFloat
+    private let style: S
+    private let action: () -> Void
     
     @Environment(\.isEnabled) private var isEnabled
     
-    public init(title: String? = nil, image: String, imagePosition: ImagePosition = .leading, spacing: CGFloat = 8, style: ButtonThemeProtocol = PrimaryTheme(), action: @escaping () -> Void) {
+    public init(
+        title: String? = nil,
+        image: String,
+        imagePosition: ImagePosition = .leading,
+        spacing: CGFloat = 8,
+        style: S = .primary,
+        action: @escaping () -> Void
+    ) where S == ButtonTheme {
+        self.title = title
+        self.image = image
+        self.imagePosition = imagePosition
+        self.spacing = spacing
+        self.style = style
+        self.action = action
+    }
+    
+    public init(
+        title: String? = nil,
+        image: String,
+        imagePosition: ImagePosition = .leading,
+        spacing: CGFloat = 8,
+        style: S,
+        action: @escaping () -> Void
+    ) {
         self.title = title
         self.image = image
         self.imagePosition = imagePosition
@@ -27,61 +50,83 @@ public struct DesignImageButton: View {
     }
     
     public var body: some View {
-        Button(action: action) {
+        SwiftUI.Button(action: action) {
             HStack(spacing: spacing) {
                 if imagePosition == .leading {
-                    imageView
-                    titleView
+                    ButtonIcon(systemName: image, font: style.font)
+                    ButtonTitle(title: title, font: style.font)
                 } else {
-                    titleView
-                    imageView
+                    ButtonTitle(title: title, font: style.font)
+                    ButtonIcon(systemName: image, font: style.font)
                 }
             }
             .frame(height: style.height)
-            .frame(maxWidth: title != nil ? .infinity : style.height) // Square if no title
+            .frame(maxWidth: title != nil ? .infinity : style.height)
             .background(isEnabled ? style.backgroundColor : style.disabledBackgroundColor)
-            .foregroundColor(style.foregroundColor)
-            .cornerRadius(style.cornerRadius)
+            .foregroundStyle(style.foregroundColor)
+            .clipShape(.rect(cornerRadius: style.cornerRadius))
         }
+        .buttonStyle(DesignInteractionStyle(theme: style))
+        .accessibilityLabel(title ?? image)
+        .accessibilityAddTraits(.isButton)
     }
+}
+
+// MARK: - Interaction Style
+private struct DesignInteractionStyle: ButtonStyle {
+    let theme: ButtonThemeProtocol
     
-    private var imageView: some View {
-        Image(systemName: image)
-            .font(style.font)
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? theme.pressedOpacity : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .animation(.easeOut(duration: 0.2), value: configuration.isPressed)
     }
+}
+
+// MARK: - Button Icon
+private struct ButtonIcon: View {
+    let systemName: String
+    let font: Font
     
-    @ViewBuilder
-    private var titleView: some View {
-        if let title = title {
+    var body: some View {
+        Image(systemName: systemName)
+            .font(font)
+    }
+}
+
+// MARK: - Button Title
+private struct ButtonTitle: View {
+    let title: String?
+    let font: Font
+    
+    var body: some View {
+        if let title {
             Text(title)
-                .font(style.font)
+                .font(font)
         }
     }
 }
 
-#Preview {
+#Preview("Image Positions") {
     VStack(spacing: 20) {
-        // Image + Text (Leading)
-        DesignImageButton(title: "Leading Image", image: "square.and.arrow.up", imagePosition: .leading, style: PrimaryTheme(), action: {})
-    
+        DesignImageButton(
+            title: "Leading Image",
+            image: "square.and.arrow.up",
+            imagePosition: .leading,
+            style: .primary,
+            action: {}
+        )
         
-        // Image + Text (Trailing)
-        DesignImageButton(title: "Trailing Image", image: "arrow.right", imagePosition: .trailing, style: PrimaryTheme(), action: {})
+        DesignImageButton(
+            title: "Trailing Image",
+            image: "arrow.right",
+            imagePosition: .trailing,
+            style: .secondary,
+            action: {}
+        )
         
-        // Image Only
-        DesignImageButton(image: "square.and.arrow.up", style: PrimaryTheme(), action: {})
-        
-        Divider()
-        
-        // Styles
-        DesignImageButton(title: "Secondary", image: "star.fill", style: SecondaryTheme(), action: {})
-        DesignImageButton(title: "Destructive", image: "trash", style: DestructiveTheme(), action: {})
-        
-        Divider()
-        
-        // Disabled
-        DesignImageButton(title: "Disabled", image: "lock",imagePosition: .leading,spacing: 200, style: PrimaryTheme(), action: {})
-            .disabled(true)
+        DesignImageButton(image: "star.fill", style: .destructive, action: {})
     }
     .padding()
 }

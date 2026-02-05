@@ -7,46 +7,75 @@
 
 import SwiftUI
 
-public struct DesignButton: View {
-    var title: String
-    var style: ButtonThemeProtocol
-    var action: () -> Void
+public struct DesignButton<S: ButtonThemeProtocol>: View {
+    private let title: String
+    private let style: S
+    private let action: () -> Void
     
     @Environment(\.isEnabled) private var isEnabled
     
-    public init(title: String, style: ButtonThemeProtocol, action: @escaping () -> Void) {
+    public init(
+        title: String,
+        style: S = .primary,
+        action: @escaping () -> Void
+    ) where S == ButtonTheme {
+        self.title = title
+        self.style = style
+        self.action = action
+    }
+    
+    public init(
+        title: String,
+        style: S,
+        action: @escaping () -> Void
+    ) {
         self.title = title
         self.style = style
         self.action = action
     }
     
     public var body: some View {
-        Button(action: action) {
+        SwiftUI.Button(action: action) {
             Text(title)
                 .font(style.font)
                 .frame(height: style.height)
                 .frame(maxWidth: .infinity)
                 .background(isEnabled ? style.backgroundColor : style.disabledBackgroundColor)
-                .foregroundColor(style.foregroundColor)
-                .cornerRadius(style.cornerRadius)
+                .foregroundStyle(style.foregroundColor)
+                .clipShape(.rect(cornerRadius: style.cornerRadius))
         }
+        .buttonStyle(DesignInteractionStyle(theme: style))
+        .accessibilityLabel(title)
+        .accessibilityAddTraits(.isButton)
     }
 }
 
-#Preview {
+// MARK: - Interaction Style
+private struct DesignInteractionStyle: ButtonStyle {
+    let theme: ButtonThemeProtocol
+    
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? theme.pressedOpacity : 1.0)
+            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
+            .animation(.easeOut(duration: 0.2), value: configuration.isPressed)
+    }
+}
+
+#Preview("Button Styles") {
     VStack(spacing: 20) {
-        DesignButton(title: "Primary", style: PrimaryTheme(), action: {})
-        DesignButton(title: "Secondary", style: SecondaryTheme(), action: {})
-        DesignButton(title: "Destructive", style: DestructiveTheme(), action: {})
+        DesignButton(title: "Primary", style: .primary, action: {})
+        DesignButton(title: "Secondary", style: .secondary, action: {})
+        DesignButton(title: "Destructive", style: .destructive, action: {})
+    }
+    .padding()
+}
+
+#Preview("Button States") {
+    VStack(spacing: 20) {
+        DesignButton(title: "Enabled", style: .primary, action: {})
         
-        Divider()
-        
-        DesignButton(title: "Disabled", style: PrimaryTheme(), action: {})
-            .disabled(true)
-        
-        DesignButton(title: "Test", style: ButtonTheme(), action: {})
-        
-        DesignButton(title: "Test Theme", style: ButtonTheme(backgroundColor: .purple, disabledBackgroundColor: .purple.opacity(0.3), foregroundColor: .white, cornerRadius: 10, height: 48, font: .title), action: {})
+        DesignButton(title: "Disabled", style: .primary, action: {})
             .disabled(true)
     }
     .padding()

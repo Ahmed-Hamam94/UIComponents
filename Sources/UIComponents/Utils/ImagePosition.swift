@@ -7,7 +7,8 @@
 
 import Foundation
 
-public enum ImagePosition {
+/// Specifies the position of an image relative to text content.
+public enum ImagePosition: Sendable {
     case leading
     case trailing
 }

@@ -7,15 +7,25 @@
 
 import SwiftUI
 
-public struct DesignCheckboxButton: View {
+public struct DesignCheckboxButton<T: CheckboxThemeProtocol>: View {
     @Binding var isOn: Bool
     private let label: String?
-    private let theme: ButtonThemeProtocol
+    private let theme: T
     
     public init(
         isOn: Binding<Bool>,
         label: String? = nil,
-        theme: ButtonThemeProtocol = PrimaryTheme()
+        theme: T = .primary
+    ) where T == DesignCheckboxTheme {
+        self._isOn = isOn
+        self.label = label
+        self.theme = theme
+    }
+    
+    public init(
+        isOn: Binding<Bool>,
+        label: String? = nil,
+        theme: T
     ) {
         self._isOn = isOn
         self.label = label
@@ -23,49 +33,64 @@ public struct DesignCheckboxButton: View {
     }
     
     public var body: some View {
-        Button(action: {
+        SwiftUI.Button(action: {
             isOn.toggle()
         }) {
             HStack(spacing: 12) {
-                checkboxIcon
+                CheckboxIcon(isOn: isOn, theme: theme)
                 
-                if let label = label {
+                if let label {
                     Text(label)
                         .font(theme.font)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(theme.textColor)
                 }
             }
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(label ?? "Checkbox")
+        .accessibilityValue(isOn ? "Checked" : "Unchecked")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint("Double tap to toggle")
     }
+}
+
+// MARK: - Checkbox Icon View
+private struct CheckboxIcon: View {
+    let isOn: Bool
+    let theme: CheckboxThemeProtocol
     
-    private var checkboxIcon: some View {
+    var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(isOn ? theme.backgroundColor : Color.gray, lineWidth: 2)
-                .frame(width: 24, height: 24)
+            RoundedRectangle(cornerRadius: theme.cornerRadius)
+                .stroke(
+                    isOn ? theme.checkedColor : theme.uncheckedBorderColor,
+                    lineWidth: theme.borderWidth
+                )
+                .frame(width: theme.size, height: theme.size)
             
             if isOn {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(theme.backgroundColor)
-                    .frame(width: 24, height: 24)
+                RoundedRectangle(cornerRadius: theme.cornerRadius)
+                    .fill(theme.checkedColor)
+                    .frame(width: theme.size, height: theme.size)
                 
                 Image(systemName: "checkmark")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(theme.foregroundColor)
+                    .font(.system(size: theme.size * 0.5, weight: .bold))
+                    .foregroundStyle(theme.checkmarkColor)
             }
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isOn)
     }
 }
 
-struct DesignCheckboxButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            DesignCheckboxButton(isOn: .constant(true))
-            DesignCheckboxButton(isOn: .constant(false), label: "Unchecked State")
-            DesignCheckboxButton(isOn: .constant(true), label: "Secondary Theme", theme: SecondaryTheme())
-        }
-        .padding()
+#Preview("Checkbox Themes") {
+    VStack(alignment: .leading, spacing: 20) {
+        DesignCheckboxButton(isOn: .constant(true))
+        DesignCheckboxButton(isOn: .constant(false), label: "Unchecked State")
+        DesignCheckboxButton(isOn: .constant(true), label: "Checked State")
+        DesignCheckboxButton(isOn: .constant(true), label: "Primary", theme: .primary)
+        DesignCheckboxButton(isOn: .constant(true), label: "Secondary", theme: .secondary)
+        DesignCheckboxButton(isOn: .constant(true), label: "Success", theme: .success)
     }
+    .padding()
 }

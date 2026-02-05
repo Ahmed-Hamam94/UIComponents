@@ -7,15 +7,25 @@
 
 import SwiftUI
 
-public struct DesignRadioButton: View {
+public struct DesignRadioButton<T: RadioButtonThemeProtocol>: View {
     @Binding private var isSelected: Bool
     private let label: String?
-    private let theme: ButtonThemeProtocol
+    private let theme: T
     
     public init(
         isSelected: Binding<Bool>,
         label: String? = nil,
-        theme: ButtonThemeProtocol = PrimaryTheme()
+        theme: T = .primary
+    ) where T == DesignRadioButtonTheme {
+        self._isSelected = isSelected
+        self.label = label
+        self.theme = theme
+    }
+    
+    public init(
+        isSelected: Binding<Bool>,
+        label: String? = nil,
+        theme: T
     ) {
         self._isSelected = isSelected
         self.label = label
@@ -23,44 +33,62 @@ public struct DesignRadioButton: View {
     }
     
     public var body: some View {
-        Button(action: {
+        SwiftUI.Button(action: {
             isSelected.toggle()
         }) {
             HStack(spacing: 12) {
-                radioIcon
+                RadioIcon(isSelected: isSelected, theme: theme)
                 
-                if let label = label {
+                if let label {
                     Text(label)
                         .font(theme.font)
-                        .foregroundColor(.primary)
+                        .foregroundStyle(theme.textColor)
                 }
             }
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(label ?? "Radio button")
+        .accessibilityValue(isSelected ? "Selected" : "Not selected")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint("Double tap to select")
     }
+}
+
+// MARK: - Radio Icon View
+private struct RadioIcon: View {
+    let isSelected: Bool
+    let theme: RadioButtonThemeProtocol
     
-    private var radioIcon: some View {
+    var body: some View {
         ZStack {
             Circle()
-                .stroke(isSelected ? theme.backgroundColor : Color.gray, lineWidth: 2)
-                .frame(width: 24, height: 24)
+                .stroke(
+                    isSelected ? theme.selectedColor : theme.unselectedBorderColor,
+                    lineWidth: theme.borderWidth
+                )
+                .frame(width: theme.size, height: theme.size)
             
             Circle()
-                .fill(isSelected ? theme.backgroundColor : Color.clear)
-                .frame(width: 12, height: 12)
+                .fill(isSelected ? theme.selectedColor : Color.clear)
+                .frame(
+                    width: theme.size * theme.innerCircleScale,
+                    height: theme.size * theme.innerCircleScale
+                )
                 .scaleEffect(isSelected ? 1.0 : 0.001)
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
     }
 }
 
-struct DesignRadioButton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            DesignRadioButton(isSelected: .constant(true))
-            DesignRadioButton(isSelected: .constant(false), label: "Unselected State")
-            DesignRadioButton(isSelected: .constant(true), label: "Secondary Theme", theme: SecondaryTheme())
-        }
-        .padding()
+#Preview("Radio Button Themes") {
+    VStack(alignment: .leading, spacing: 20) {
+        DesignRadioButton(isSelected: .constant(true))
+        DesignRadioButton(isSelected: .constant(false), label: "Unselected State")
+        DesignRadioButton(isSelected: .constant(true), label: "Selected State")
+        DesignRadioButton(isSelected: .constant(true), label: "Primary", theme: .primary)
+        DesignRadioButton(isSelected: .constant(true), label: "Secondary", theme: .secondary)
+        DesignRadioButton(isSelected: .constant(true), label: "Success", theme: .success)
     }
+    .padding()
 }
