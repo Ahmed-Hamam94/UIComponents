@@ -7,19 +7,19 @@
 
 import SwiftUI
 
-public struct DesignSkeleton: View {
+public enum SkeletonShape: Sendable {
+    case rectangle(cornerRadius: CGFloat = 8)
+    case circle
+}
+
+public struct DesignSkeleton<T: SkeletonThemeProtocol>: View {
     private let shape: SkeletonShape
-    private let theme: SkeletonThemeProtocol
+    private let theme: T
     @State private var phase: CGFloat = 0
-    
-    public enum SkeletonShape {
-        case rectangle(cornerRadius: CGFloat = 8)
-        case circle
-    }
     
     public init(
         shape: SkeletonShape = .rectangle(),
-        theme: SkeletonThemeProtocol = DesignSkeletonTheme()
+        theme: T
     ) {
         self.shape = shape
         self.theme = theme
@@ -28,7 +28,7 @@ public struct DesignSkeleton: View {
     public var body: some View {
         GeometryReader { geo in
             ZStack {
-                skeletonView
+                SkeletonBaseShape(shape: shape, color: theme.baseColor)
                 
                 LinearGradient(
                     gradient: Gradient(colors: [.clear, theme.highlightColor, .clear]),
@@ -37,48 +37,63 @@ public struct DesignSkeleton: View {
                 )
                 .frame(width: geo.size.width * 0.5)
                 .offset(x: -geo.size.width * 0.5 + (geo.size.width * 1.5 * phase))
-                .mask(skeletonView)
+                .mask(SkeletonBaseShape(shape: shape, color: theme.baseColor))
             }
             .onAppear {
-                withAnimation(Animation.linear(duration: theme.animationDuration).repeatForever(autoreverses: false)) {
+                withAnimation(.linear(duration: theme.animationDuration).repeatForever(autoreverses: false)) {
                     phase = 1
                 }
             }
         }
+        .accessibilityLabel("Loading")
+        .accessibilityAddTraits(.updatesFrequently)
     }
+}
+
+extension DesignSkeleton where T == DesignSkeletonTheme {
+    public init(
+        shape: SkeletonShape = .rectangle(),
+        theme: DesignSkeletonTheme = .default
+    ) {
+        self.shape = shape
+        self.theme = theme
+    }
+}
+
+// MARK: - Skeleton Base Shape
+private struct SkeletonBaseShape: View {
+    let shape: SkeletonShape
+    let color: Color
     
-    @ViewBuilder
-    private var skeletonView: some View {
+    var body: some View {
         switch shape {
         case .rectangle(let cornerRadius):
             RoundedRectangle(cornerRadius: cornerRadius)
-                .fill(theme.baseColor)
+                .fill(color)
         case .circle:
             Circle()
-                .fill(theme.baseColor)
+                .fill(color)
         }
     }
 }
 
-struct DesignSkeleton_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 20) {
-            HStack {
-                DesignSkeleton(shape: .circle)
-                    .frame(width: 50, height: 50)
-                
-                VStack(alignment: .leading) {
-                    DesignSkeleton()
-                        .frame(height: 20)
-                    DesignSkeleton()
-                        .frame(width: 150, height: 15)
-                }
-            }
-            .frame(height: 60)
+#Preview("Skeleton Card") {
+    VStack(spacing: 20) {
+        HStack {
+            DesignSkeleton(shape: .circle)
+                .frame(width: 50, height: 50)
             
-            DesignSkeleton()
-                .frame(height: 100)
+            VStack(alignment: .leading) {
+                DesignSkeleton()
+                    .frame(height: 20)
+                DesignSkeleton()
+                    .frame(width: 150, height: 15)
+            }
         }
-        .padding()
+        .frame(height: 60)
+        
+        DesignSkeleton(shape: .rectangle(cornerRadius: 5), theme: .default)
+            .frame(height: 100)
     }
+    .padding()
 }

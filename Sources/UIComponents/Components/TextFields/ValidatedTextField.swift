@@ -98,10 +98,10 @@ public struct ValidatedTextField: View {
                             .foregroundColor(theme.placeholderColor)
                     }
                     
-                    TextField("", text: $text)
+                    SwiftUI.TextField("", text: $text)
                         .font(theme.font)
-                        .foregroundColor(theme.textColor)
-                        .onChange(of: text) { newValue in
+                        .foregroundStyle(theme.textColor)
+                        .onChange(of: text) { _, newValue in
                             hasBeenEdited = true
                             if validationTrigger == .onChange {
                                 withAnimation(.easeInOut(duration: 0.2)) {

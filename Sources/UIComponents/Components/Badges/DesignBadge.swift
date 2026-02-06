@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-public struct DesignBadge: View {
+public struct DesignBadge<T: BadgeThemeProtocol>: View {
     private let text: String
-    private let theme: BadgeThemeProtocol
+    private let theme: T
     
     public init(
         _ text: String,
-        theme: BadgeThemeProtocol = DesignBadgeTheme()
+        theme: T
     ) {
         self.text = text
         self.theme = theme
@@ -22,22 +22,32 @@ public struct DesignBadge: View {
     public var body: some View {
         Text(text)
             .font(theme.font)
-            .foregroundColor(theme.textColor)
+            .foregroundStyle(theme.textColor)
             .padding(.horizontal, theme.horizontalPadding)
             .padding(.vertical, theme.verticalPadding)
+            .frame(minWidth: theme.width, minHeight: theme.height)
             .background(theme.backgroundColor)
-            .cornerRadius(theme.cornerRadius)
+            .clipShape(.rect(cornerRadius: theme.cornerRadius))
+            .accessibilityLabel("Badge: \(text)")
     }
 }
 
-struct DesignBadge_Previews: PreviewProvider {
-    static var previews: some View {
-        HStack(spacing: 10) {
-            DesignBadge("New")
-            DesignBadge("Success", theme: DesignBadgeTheme.success)
-            DesignBadge("Warning", theme: DesignBadgeTheme.warning)
-            DesignBadge("Error", theme: DesignBadgeTheme.error)
-        }
-        .padding()
+extension DesignBadge where T == DesignBadgeTheme {
+    public init(
+        _ text: String,
+        theme: DesignBadgeTheme = .default
+    ) {
+        self.text = text
+        self.theme = theme
     }
+}
+
+#Preview("Badge Variants") {
+    HStack(spacing: 10) {
+        DesignBadge("New")
+        DesignBadge("Success", theme: .success)
+        DesignBadge("Warning", theme: .warning)
+        DesignBadge("Error", theme: .error)
+    }
+    .padding()
 }

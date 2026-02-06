@@ -22,22 +22,6 @@ public struct DesignImageButton<S: ButtonThemeProtocol>: View {
         image: String,
         imagePosition: ImagePosition = .leading,
         spacing: CGFloat = 8,
-        style: S = .primary,
-        action: @escaping () -> Void
-    ) where S == ButtonTheme {
-        self.title = title
-        self.image = image
-        self.imagePosition = imagePosition
-        self.spacing = spacing
-        self.style = style
-        self.action = action
-    }
-    
-    public init(
-        title: String? = nil,
-        image: String,
-        imagePosition: ImagePosition = .leading,
-        spacing: CGFloat = 8,
         style: S,
         action: @escaping () -> Void
     ) {
@@ -69,6 +53,24 @@ public struct DesignImageButton<S: ButtonThemeProtocol>: View {
         .buttonStyle(DesignInteractionStyle(theme: style))
         .accessibilityLabel(title ?? image)
         .accessibilityAddTraits(.isButton)
+    }
+}
+
+extension DesignImageButton where S == ButtonTheme {
+    public init(
+        title: String? = nil,
+        image: String,
+        imagePosition: ImagePosition = .leading,
+        spacing: CGFloat = 8,
+        style: ButtonTheme = .primary,
+        action: @escaping () -> Void
+    ) {
+        self.title = title
+        self.image = image
+        self.imagePosition = imagePosition
+        self.spacing = spacing
+        self.style = style
+        self.action = action
     }
 }
 

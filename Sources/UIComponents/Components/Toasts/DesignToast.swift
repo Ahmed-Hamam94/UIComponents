@@ -7,19 +7,19 @@
 
 import SwiftUI
 
-public enum ToastPosition {
+public enum ToastPosition: Sendable {
     case top, bottom
 }
 
-public struct DesignToast: View {
+public struct DesignToast<T: ToastThemeProtocol>: View {
     private let message: String
     private let icon: String?
-    private let theme: ToastThemeProtocol
+    private let theme: T
     
     public init(
         message: String,
         icon: String? = nil,
-        theme: ToastThemeProtocol = DesignToastTheme()
+        theme: T
     ) {
         self.message = message
         self.icon = icon
@@ -28,22 +28,66 @@ public struct DesignToast: View {
     
     public var body: some View {
         HStack(spacing: 12) {
-            if let icon = icon {
+            if let icon {
                 Image(systemName: icon)
-                    .foregroundColor(theme.iconColor)
+                    .foregroundStyle(theme.iconColor)
             }
             
             Text(message)
                 .font(theme.font)
-                .foregroundColor(theme.textColor)
+                .foregroundStyle(theme.textColor)
             
             Spacer(minLength: 0)
         }
         .padding(theme.padding)
         .background(theme.backgroundColor)
-        .cornerRadius(theme.cornerRadius)
+        .clipShape(.rect(cornerRadius: theme.cornerRadius))
         .shadow(color: theme.shadowColor, radius: 10, x: 0, y: 5)
         .padding(.horizontal, 20)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Notification: \(message)")
+        .accessibilityAddTraits(.isStaticText)
+    }
+}
+
+extension DesignToast where T == DesignToastTheme {
+    public init(
+        message: String,
+        icon: String? = nil,
+        theme: DesignToastTheme = .default
+    ) {
+        self.message = message
+        self.icon = icon
+        self.theme = theme
+    }
+}
+
+// MARK: - Toast View Modifier
+private struct ToastModifier<T: ToastThemeProtocol>: ViewModifier {
+    @Binding var isPresented: Bool
+    let message: String
+    let icon: String?
+    let position: ToastPosition
+    let duration: Double
+    let theme: T
+    
+    func body(content: Content) -> some View {
+        ZStack(alignment: position == .top ? .top : .bottom) {
+            content
+            
+            if isPresented {
+                DesignToast(message: message, icon: icon, theme: theme)
+                    .transition(.move(edge: position == .top ? .top : .bottom).combined(with: .opacity))
+                    .task {
+                        try? await Task.sleep(for: .seconds(duration))
+                        withAnimation {
+                            isPresented = false
+                        }
+                    }
+                    .zIndex(100)
+            }
+        }
+        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: isPresented)
     }
 }
 
@@ -54,38 +98,57 @@ public extension View {
         icon: String? = nil,
         position: ToastPosition = .bottom,
         duration: Double = 3.0,
-        theme: ToastThemeProtocol = DesignToastTheme()
+        theme: DesignToastTheme = .default
     ) -> some View {
-        ZStack(alignment: position == .top ? .top : .bottom) {
-            self
-            
-            if isPresented.wrappedValue {
-                DesignToast(message: message, icon: icon, theme: theme)
-                    .transition(.move(edge: position == .top ? .top : .bottom).combined(with: .opacity))
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                            withAnimation {
-                                isPresented.wrappedValue = false
-                            }
-                        }
-                    }
-                    .zIndex(100)
-            }
-        }
-        .animation(.spring(response: 0.4, dampingFraction: 0.8), value: isPresented.wrappedValue)
+        modifier(ToastModifier(
+            isPresented: isPresented,
+            message: message,
+            icon: icon,
+            position: position,
+            duration: duration,
+            theme: theme
+        ))
+    }
+    
+    func designToast<T: ToastThemeProtocol>(
+        isPresented: Binding<Bool>,
+        message: String,
+        icon: String? = nil,
+        position: ToastPosition = .bottom,
+        duration: Double = 3.0,
+        theme: T
+    ) -> some View {
+        modifier(ToastModifier(
+            isPresented: isPresented,
+            message: message,
+            icon: icon,
+            position: position,
+            duration: duration,
+            theme: theme
+        ))
     }
 }
 
-struct DesignToast_Previews: PreviewProvider {
-    @State static var isPresented = true
-    
-    static var previews: some View {
-        Color.gray
+#Preview("Toast Top") {
+    VStack(spacing: 10) {
+        Color.gray.opacity(0.2)
             .designToast(
-                isPresented: $isPresented,
+                isPresented: .constant(true),
                 message: "This is a toast message!",
                 icon: "checkmark.circle.fill",
-                position: .top
+                position: .top,
+                theme: .success
+            )
+        
+        DesignToast(message: "Test", icon: "checkmark.circle.fill" , theme: .success)
+        
+        Color.gray.opacity(0.2)
+            .designToast(
+                isPresented: .constant(true),
+                message: "Success! Your changes have been saved.",
+                icon: "checkmark.circle.fill",
+                position: .bottom,
+                theme: .default
             )
     }
 }

@@ -1,12 +1,13 @@
 //
-//  CardThemeProtocol.swift
+//  CardTheme.swift
 //  UIComponents
 //
 //  Created by Ahmed Hamam on 28/01/2026.
+//
 
 import SwiftUI
 
-public protocol CardThemeProtocol {
+public protocol CardThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
     var shadowColor: Color { get }
@@ -15,7 +16,7 @@ public protocol CardThemeProtocol {
     var padding: CGFloat { get }
 }
 
-public struct DesignCardTheme: CardThemeProtocol {
+public struct DesignCardTheme: CardThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat
     public var shadowColor: Color
@@ -37,5 +38,11 @@ public struct DesignCardTheme: CardThemeProtocol {
         self.shadowRadius = shadowRadius
         self.shadowOffset = shadowOffset
         self.padding = padding
+    }
+}
+
+public extension CardThemeProtocol where Self == DesignCardTheme {
+    static var `default`: DesignCardTheme {
+        DesignCardTheme()
     }
 }

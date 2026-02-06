@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public struct DesignDialog: View {
+public struct DesignDialog<T: DialogThemeProtocol>: View {
     @Binding var isPresented: Bool
     private let title: String
     private let message: String
@@ -15,7 +15,7 @@ public struct DesignDialog: View {
     private let secondaryButton: String?
     private let primaryAction: () -> Void
     private let secondaryAction: (() -> Void)?
-    private let theme: DialogThemeProtocol
+    private let theme: T
     
     public init(
         isPresented: Binding<Bool>,
@@ -25,7 +25,7 @@ public struct DesignDialog: View {
         secondaryButton: String? = nil,
         primaryAction: @escaping () -> Void,
         secondaryAction: (() -> Void)? = nil,
-        theme: DialogThemeProtocol = DesignDialogTheme()
+        theme: T
     ) {
         self._isPresented = isPresented
         self.title = title
@@ -48,62 +48,36 @@ public struct DesignDialog: View {
                     }
                 
                 // Dialog Box
-                VStack(spacing: 0) {
-                    VStack(spacing: 8) {
-                        Text(title)
-                            .font(theme.titleFont)
-                            .foregroundColor(theme.titleColor)
-                            .multilineTextAlignment(.center)
-                        
-                        Text(message)
-                            .font(theme.messageFont)
-                            .foregroundColor(theme.messageColor)
-                            .multilineTextAlignment(.center)
+                DialogContent(
+                    title: title,
+                    message: message,
+                    primaryButton: primaryButton,
+                    secondaryButton: secondaryButton,
+                    theme: theme,
+                    onPrimary: {
+                        primaryAction()
+                        isPresented = false
+                    },
+                    onSecondary: {
+                        secondaryAction?()
+                        isPresented = false
                     }
-                    .padding(24)
-                    
-                    Divider()
-                    
-                    HStack(spacing: 0) {
-                        if let secondaryButton = secondaryButton {
-                            Button(action: {
-                                secondaryAction?()
-                                isPresented = false
-                            }) {
-                                Text(secondaryButton)
-                                    .font(theme.buttonFont)
-                                    .frame(maxWidth: .infinity, minHeight: 48)
-                            }
-                            
-                            Divider()
-                                .frame(height: 48)
-                        }
-                        
-                        Button(action: {
-                            primaryAction()
-                            isPresented = false
-                        }) {
-                            Text(primaryButton)
-                                .font(theme.buttonFont)
-                                .frame(maxWidth: .infinity, minHeight: 48)
-                        }
-                    }
-                }
-                .background(theme.backgroundColor)
-                .cornerRadius(theme.cornerRadius)
+                )
                 .frame(maxWidth: theme.maxWidth)
                 .padding(40)
                 .transition(.scale(scale: 0.9).combined(with: .opacity))
             }
             .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isPresented)
             .zIndex(100)
+            .accessibilityElement(children: .contain)
+            .accessibilityAddTraits(.isModal)
+            .accessibilityLabel("Dialog: \(title)")
         }
     }
 }
 
-// Extension to use as a modifier
-public extension View {
-    func designDialog(
+extension DesignDialog where T == DesignDialogTheme {
+    public init(
         isPresented: Binding<Bool>,
         title: String,
         message: String,
@@ -111,12 +85,86 @@ public extension View {
         secondaryButton: String? = nil,
         primaryAction: @escaping () -> Void,
         secondaryAction: (() -> Void)? = nil,
-        theme: DialogThemeProtocol = DesignDialogTheme()
-    ) -> some View {
+        theme: DesignDialogTheme = .default
+    ) {
+        self._isPresented = isPresented
+        self.title = title
+        self.message = message
+        self.primaryButton = primaryButton
+        self.secondaryButton = secondaryButton
+        self.primaryAction = primaryAction
+        self.secondaryAction = secondaryAction
+        self.theme = theme
+    }
+}
+
+// MARK: - Dialog Content View
+private struct DialogContent<T: DialogThemeProtocol>: View {
+    let title: String
+    let message: String
+    let primaryButton: String
+    let secondaryButton: String?
+    let theme: T
+    let onPrimary: () -> Void
+    let onSecondary: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(spacing: 8) {
+                Text(title)
+                    .font(theme.titleFont)
+                    .foregroundStyle(theme.titleColor)
+                    .multilineTextAlignment(.center)
+                
+                Text(message)
+                    .font(theme.messageFont)
+                    .foregroundStyle(theme.messageColor)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(24)
+            
+            Divider()
+            
+            HStack(spacing: 0) {
+                if let secondaryButton {
+                    SwiftUI.Button(action: onSecondary) {
+                        Text(secondaryButton)
+                            .font(theme.buttonFont)
+                            .frame(maxWidth: .infinity, minHeight: 48)
+                    }
+                    
+                    Divider()
+                        .frame(height: 48)
+                }
+                
+                SwiftUI.Button(action: onPrimary) {
+                    Text(primaryButton)
+                        .font(theme.buttonFont)
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                }
+            }
+        }
+        .background(theme.backgroundColor)
+        .clipShape(.rect(cornerRadius: theme.cornerRadius))
+    }
+}
+
+// MARK: - Dialog View Modifier
+private struct DialogModifier<T: DialogThemeProtocol>: ViewModifier {
+    @Binding var isPresented: Bool
+    let title: String
+    let message: String
+    let primaryButton: String
+    let secondaryButton: String?
+    let primaryAction: () -> Void
+    let secondaryAction: (() -> Void)?
+    let theme: T
+    
+    func body(content: Content) -> some View {
         ZStack {
-            self
+            content
             DesignDialog(
-                isPresented: isPresented,
+                isPresented: $isPresented,
                 title: title,
                 message: message,
                 primaryButton: primaryButton,
@@ -129,18 +177,61 @@ public extension View {
     }
 }
 
-struct DesignDialog_Previews: PreviewProvider {
-    @State static var isPresented = true
-    
-    static var previews: some View {
-        Color.gray
-            .designDialog(
-                isPresented: $isPresented,
-                title: "Confirm Action",
-                message: "Are you sure you want to proceed with this operation? This cannot be undone.",
-                primaryButton: "Confirm",
-                secondaryButton: "Cancel",
-                primaryAction: { print("Confirmed") }
-            )
+public extension View {
+    func designDialog(
+        isPresented: Binding<Bool>,
+        title: String,
+        message: String,
+        primaryButton: String,
+        secondaryButton: String? = nil,
+        primaryAction: @escaping () -> Void,
+        secondaryAction: (() -> Void)? = nil,
+        theme: DesignDialogTheme = .default
+    ) -> some View {
+        modifier(DialogModifier(
+            isPresented: isPresented,
+            title: title,
+            message: message,
+            primaryButton: primaryButton,
+            secondaryButton: secondaryButton,
+            primaryAction: primaryAction,
+            secondaryAction: secondaryAction,
+            theme: theme
+        ))
     }
+    
+    func designDialog<T: DialogThemeProtocol>(
+        isPresented: Binding<Bool>,
+        title: String,
+        message: String,
+        primaryButton: String,
+        secondaryButton: String? = nil,
+        primaryAction: @escaping () -> Void,
+        secondaryAction: (() -> Void)? = nil,
+        theme: T
+    ) -> some View {
+        modifier(DialogModifier(
+            isPresented: isPresented,
+            title: title,
+            message: message,
+            primaryButton: primaryButton,
+            secondaryButton: secondaryButton,
+            primaryAction: primaryAction,
+            secondaryAction: secondaryAction,
+            theme: theme
+        ))
+    }
+}
+
+#Preview("Confirmation Dialog") {
+    Color.gray.opacity(0.2)
+        .designDialog(
+            isPresented: .constant(true),
+            title: "Confirm Action",
+            message: "Are you sure you want to proceed with this operation? This cannot be undone.",
+            primaryButton: "Confirm",
+            secondaryButton: "Cancel",
+            primaryAction: {},
+            theme: .default
+        )
 }

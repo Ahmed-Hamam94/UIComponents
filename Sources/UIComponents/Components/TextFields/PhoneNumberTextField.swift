@@ -70,14 +70,14 @@ public struct PhoneNumberTextField: View {
             if hasMultipleCountries {
                 Menu {
                     ForEach(countries) { country in
-                        Button {
+                        SwiftUI.Button {
                             selectedCountry = country
                         } label: {
                             HStack {
                                 Text(country.flag)
                                 Text(country.name)
                                 Text(country.dialCode)
-                                    .foregroundColor(.secondary)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -119,9 +119,9 @@ public struct PhoneNumberTextField: View {
                     .foregroundColor(theme.placeholderColor)
             }
             
-            TextField("", text: $phoneNumber)
+            SwiftUI.TextField("", text: $phoneNumber)
                 .font(theme.font)
-                .foregroundColor(theme.textColor)
+                .foregroundStyle(theme.textColor)
                 #if os(iOS)
                 .keyboardType(.phonePad)
                 #endif

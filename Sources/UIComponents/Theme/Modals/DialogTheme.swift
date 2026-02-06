@@ -1,12 +1,13 @@
 //
-//  DialogThemeProtocol.swift
+//  DialogTheme.swift
 //  UIComponents
 //
 //  Created by Ahmed Hamam on 28/01/2026.
+//
 
 import SwiftUI
 
-public protocol DialogThemeProtocol {
+public protocol DialogThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
     var titleFont: Font { get }
@@ -18,7 +19,7 @@ public protocol DialogThemeProtocol {
     var maxWidth: CGFloat { get }
 }
 
-public struct DesignDialogTheme: DialogThemeProtocol {
+public struct DesignDialogTheme: DialogThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat
     public var titleFont: Font
@@ -49,5 +50,11 @@ public struct DesignDialogTheme: DialogThemeProtocol {
         self.messageColor = messageColor
         self.overlayColor = overlayColor
         self.maxWidth = maxWidth
+    }
+}
+
+public extension DialogThemeProtocol where Self == DesignDialogTheme {
+    static var `default`: DesignDialogTheme {
+        DesignDialogTheme()
     }
 }

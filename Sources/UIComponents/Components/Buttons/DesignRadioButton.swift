@@ -15,16 +15,6 @@ public struct DesignRadioButton<T: RadioButtonThemeProtocol>: View {
     public init(
         isSelected: Binding<Bool>,
         label: String? = nil,
-        theme: T = .primary
-    ) where T == DesignRadioButtonTheme {
-        self._isSelected = isSelected
-        self.label = label
-        self.theme = theme
-    }
-    
-    public init(
-        isSelected: Binding<Bool>,
-        label: String? = nil,
         theme: T
     ) {
         self._isSelected = isSelected
@@ -55,10 +45,22 @@ public struct DesignRadioButton<T: RadioButtonThemeProtocol>: View {
     }
 }
 
+extension DesignRadioButton where T == DesignRadioButtonTheme {
+    public init(
+        isSelected: Binding<Bool>,
+        label: String? = nil,
+        theme: DesignRadioButtonTheme = .primary
+    ) {
+        self._isSelected = isSelected
+        self.label = label
+        self.theme = theme
+    }
+}
+
 // MARK: - Radio Icon View
-private struct RadioIcon: View {
+private struct RadioIcon<T: RadioButtonThemeProtocol>: View {
     let isSelected: Bool
-    let theme: RadioButtonThemeProtocol
+    let theme: T
     
     var body: some View {
         ZStack {

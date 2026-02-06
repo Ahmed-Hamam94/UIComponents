@@ -7,15 +7,18 @@
 
 import SwiftUI
 
-public struct DesignCard<Content: View>: View {
+public struct DesignCard<Content: View, T: CardThemeProtocol>: View {
     private let content: Content
-    private let theme: CardThemeProtocol
+    private let theme: T
+    private let accessibilityLabel: String?
     
     public init(
-        theme: CardThemeProtocol = DesignCardTheme(),
-        @ViewBuilder content: () -> Content
+        theme: T,
+        accessibilityLabel: String? = nil,
+        @ViewBuilder content: @escaping () -> Content
     ) {
         self.theme = theme
+        self.accessibilityLabel = accessibilityLabel
         self.content = content()
     }
     
@@ -23,35 +26,39 @@ public struct DesignCard<Content: View>: View {
         content
             .padding(theme.padding)
             .background(theme.backgroundColor)
-            .cornerRadius(theme.cornerRadius)
+            .clipShape(.rect(cornerRadius: theme.cornerRadius))
             .shadow(
                 color: theme.shadowColor,
                 radius: theme.shadowRadius,
                 x: theme.shadowOffset.x,
                 y: theme.shadowOffset.y
             )
+            .accessibilityElement(children: accessibilityLabel != nil ? .combine : .contain)
+            .accessibilityLabel(accessibilityLabel ?? "")
     }
 }
 
-struct DesignCard_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 20) {
-            DesignCard {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Card Title")
-                        .font(.headline)
-                    Text("This is some content inside the card. It looks premium and clean.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-            }
-            
-            DesignCard(theme: DesignCardTheme(backgroundColor: .green)) {
-                Text("Green Card")
-                    .foregroundColor(.white)
-                    .bold()
-            }
-        }
-        .padding()
+extension DesignCard where T == DesignCardTheme {
+    public init(
+        theme: DesignCardTheme = .default,
+        accessibilityLabel: String? = nil,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.theme = theme
+        self.accessibilityLabel = accessibilityLabel
+        self.content = content()
     }
+}
+
+#Preview("Default Card") {
+    DesignCard {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Card Title")
+                .font(.headline)
+            Text("This is some content inside the card. It looks premium and clean.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+    }
+    .padding()
 }

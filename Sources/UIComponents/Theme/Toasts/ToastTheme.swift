@@ -1,12 +1,13 @@
 //
-//  ToastThemeProtocol.swift
+//  ToastTheme.swift
 //  UIComponents
 //
 //  Created by Ahmed Hamam on 28/01/2026.
+//
 
 import SwiftUI
 
-public protocol ToastThemeProtocol {
+public protocol ToastThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var textColor: Color { get }
     var font: Font { get }
@@ -16,7 +17,7 @@ public protocol ToastThemeProtocol {
     var iconColor: Color { get }
 }
 
-public struct DesignToastTheme: ToastThemeProtocol {
+public struct DesignToastTheme: ToastThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var textColor: Color
     public var font: Font
@@ -26,7 +27,7 @@ public struct DesignToastTheme: ToastThemeProtocol {
     public var iconColor: Color
     
     public init(
-        backgroundColor: Color = Color(.systemBackground),
+        backgroundColor: Color = .white,
         textColor: Color = .primary,
         font: Font = .subheadline,
         cornerRadius: CGFloat = 12,
@@ -44,12 +45,20 @@ public struct DesignToastTheme: ToastThemeProtocol {
     }
 }
 
-public extension DesignToastTheme {
+public extension ToastThemeProtocol where Self == DesignToastTheme {
+    static var `default`: DesignToastTheme {
+        DesignToastTheme()
+    }
+    
     static var error: DesignToastTheme {
         DesignToastTheme(iconColor: .red)
     }
     
     static var success: DesignToastTheme {
         DesignToastTheme(iconColor: .green)
+    }
+    
+    static var warning: DesignToastTheme {
+        DesignToastTheme(iconColor: .orange)
     }
 }

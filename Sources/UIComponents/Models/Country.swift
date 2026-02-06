@@ -7,14 +7,15 @@
 
 import Foundation
 
-public struct Country: Identifiable, Equatable, Hashable {
-    public let id = UUID()
+public struct Country: Identifiable, Equatable, Hashable, Sendable {
+    public let id: UUID
     public let code: String      // ISO country code (e.g., "SA", "US")
     public let flag: String      // Emoji flag (e.g., "🇸🇦", "🇺🇸")
     public let dialCode: String  // Dial code (e.g., "+966", "+1")
     public let name: String      // Country name (e.g., "Saudi Arabia")
     
-    public init(code: String, flag: String, dialCode: String, name: String) {
+    public init(code: String, flag: String, dialCode: String, name: String, id: UUID = UUID()) {
+        self.id = id
         self.code = code
         self.flag = flag
         self.dialCode = dialCode

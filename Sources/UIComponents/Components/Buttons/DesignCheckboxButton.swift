@@ -15,16 +15,6 @@ public struct DesignCheckboxButton<T: CheckboxThemeProtocol>: View {
     public init(
         isOn: Binding<Bool>,
         label: String? = nil,
-        theme: T = .primary
-    ) where T == DesignCheckboxTheme {
-        self._isOn = isOn
-        self.label = label
-        self.theme = theme
-    }
-    
-    public init(
-        isOn: Binding<Bool>,
-        label: String? = nil,
         theme: T
     ) {
         self._isOn = isOn
@@ -55,10 +45,22 @@ public struct DesignCheckboxButton<T: CheckboxThemeProtocol>: View {
     }
 }
 
+extension DesignCheckboxButton where T == DesignCheckboxTheme {
+    public init(
+        isOn: Binding<Bool>,
+        label: String? = nil,
+        theme: DesignCheckboxTheme = .primary
+    ) {
+        self._isOn = isOn
+        self.label = label
+        self.theme = theme
+    }
+}
+
 // MARK: - Checkbox Icon View
-private struct CheckboxIcon: View {
+private struct CheckboxIcon<T: CheckboxThemeProtocol>: View {
     let isOn: Bool
-    let theme: CheckboxThemeProtocol
+    let theme: T
     
     var body: some View {
         ZStack {

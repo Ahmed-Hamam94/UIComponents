@@ -16,16 +16,6 @@ public struct DesignButton<S: ButtonThemeProtocol>: View {
     
     public init(
         title: String,
-        style: S = .primary,
-        action: @escaping () -> Void
-    ) where S == ButtonTheme {
-        self.title = title
-        self.style = style
-        self.action = action
-    }
-    
-    public init(
-        title: String,
         style: S,
         action: @escaping () -> Void
     ) {
@@ -50,6 +40,18 @@ public struct DesignButton<S: ButtonThemeProtocol>: View {
     }
 }
 
+extension DesignButton where S == ButtonTheme {
+    public init(
+        title: String,
+        style: ButtonTheme = .primary,
+        action: @escaping () -> Void
+    ) {
+        self.title = title
+        self.style = style
+        self.action = action
+    }
+}
+
 // MARK: - Interaction Style
 private struct DesignInteractionStyle: ButtonStyle {
     let theme: ButtonThemeProtocol
@@ -67,16 +69,6 @@ private struct DesignInteractionStyle: ButtonStyle {
         DesignButton(title: "Primary", style: .primary, action: {})
         DesignButton(title: "Secondary", style: .secondary, action: {})
         DesignButton(title: "Destructive", style: .destructive, action: {})
-    }
-    .padding()
-}
-
-#Preview("Button States") {
-    VStack(spacing: 20) {
-        DesignButton(title: "Enabled", style: .primary, action: {})
-        
-        DesignButton(title: "Disabled", style: .primary, action: {})
-            .disabled(true)
     }
     .padding()
 }

@@ -9,94 +9,186 @@ import SwiftUI
 
 public struct DesignTextField: View {
     @Binding var text: String
-    var placeholder: String
-    var image: String?
-    var imagePosition: ImagePosition
-    var theme: TextFieldThemeProtocol
+    @FocusState private var isFocused: Bool
+    @Environment(\.isEnabled) private var isEnabled
     
-    public init(text: Binding<String>, placeholder: String, image: String? = nil, imagePosition: ImagePosition = .leading, theme: TextFieldThemeProtocol = DesignTextFieldTheme()) {
+    private let placeholder: String
+    private let image: String?
+    private let imagePosition: ImagePosition
+    private let theme: TextFieldThemeProtocol
+    private let errorMessage: String?
+    
+    public init(
+        text: Binding<String>,
+        placeholder: String,
+        image: String? = nil,
+        imagePosition: ImagePosition = .leading,
+        theme: TextFieldThemeProtocol = DesignTextFieldTheme(),
+        errorMessage: String? = nil
+    ) {
         self._text = text
         self.placeholder = placeholder
         self.image = image
         self.imagePosition = imagePosition
         self.theme = theme
+        self.errorMessage = errorMessage
     }
     
+    // MARK: - Computed State Properties
+    
+    private var hasError: Bool {
+        errorMessage != nil
+    }
+    
+    private var currentBackgroundColor: Color {
+        if !isEnabled {
+            return theme.disabledBackgroundColor
+        } else if hasError {
+            return theme.errorBackgroundColor
+        } else if isFocused {
+            return theme.focusBackgroundColor
+        }
+        return theme.backgroundColor
+    }
+    
+    private var currentBorderColor: Color {
+        if !isEnabled {
+            return theme.disabledBorderColor
+        } else if hasError {
+            return theme.errorBorderColor
+        } else if isFocused {
+            return theme.focusBorderColor
+        }
+        return theme.borderColor
+    }
+    
+    private var currentTextColor: Color {
+        if !isEnabled {
+            return theme.disabledTextColor
+        }
+        return theme.textColor
+    }
+    
+    // MARK: - Body
+    
     public var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            textFieldContainer
+            
+            if let errorMessage {
+                ErrorLabel(message: errorMessage, theme: theme)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(placeholder)
+        .accessibilityValue(text.isEmpty ? "Empty" : text)
+        .accessibilityHint(errorMessage ?? "")
+    }
+    
+    private var textFieldContainer: some View {
         HStack(spacing: 8) {
-            if let image = image, imagePosition == .leading {
-                imageView(image)
+            if let image, imagePosition == .leading {
+                IconView(systemName: image, color: theme.iconColor)
             }
             
             ZStack(alignment: .leading) {
                 if text.isEmpty {
                     Text(placeholder)
                         .font(theme.placeholderFont)
-                        .foregroundColor(theme.placeholderColor)
+                        .foregroundStyle(theme.placeholderColor)
                 }
                 
-                TextField("", text: $text)
+                SwiftUI.TextField("", text: $text)
                     .font(theme.font)
-                    .foregroundColor(theme.textColor)
+                    .foregroundStyle(currentTextColor)
+                    .focused($isFocused)
             }
             
-            if let image = image, imagePosition == .trailing {
-                imageView(image)
+            if let image, imagePosition == .trailing {
+                IconView(systemName: image, color: theme.iconColor)
             }
         }
         .padding(.horizontal, 12)
         .frame(height: theme.height)
-        .background(theme.backgroundColor)
-        .cornerRadius(theme.cornerRadius)
+        .background(currentBackgroundColor)
+        .clipShape(.rect(cornerRadius: theme.cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: theme.cornerRadius)
-                .stroke(theme.borderColor, lineWidth: theme.borderWidth)
+                .stroke(currentBorderColor, lineWidth: theme.borderWidth)
         )
-    }
-    
-    private func imageView(_ name: String) -> some View {
-        Image(systemName: name)
-            .foregroundColor(theme.placeholderColor) // Match placeholder color for icon? Or maybe add iconColor to theme later.
+        .animation(.easeInOut(duration: 0.2), value: isFocused)
+        .animation(.easeInOut(duration: 0.2), value: hasError)
     }
 }
 
-#Preview {
+// MARK: - Icon View
+private struct IconView: View {
+    let systemName: String
+    let color: Color
+    
+    var body: some View {
+        Image(systemName: systemName)
+            .foregroundStyle(color)
+    }
+}
+
+// MARK: - Error Label
+private struct ErrorLabel: View {
+    let message: String
+    let theme: TextFieldThemeProtocol
+    
+    var body: some View {
+        Text(message)
+            .font(.caption)
+            .foregroundStyle(theme.errorTextColor)
+    }
+}
+
+// MARK: - Previews
+
+#Preview("Theme States") {
     VStack(spacing: 20) {
-        // Default Theme
         DesignTextField(text: .constant(""), placeholder: "Default")
-        
-        // Custom Theme (Bordered)
+        DesignTextField(text: .constant("With text"), placeholder: "Default")
+        DesignTextField(text: .constant(""), placeholder: "Disabled")
+            .disabled(true)
         DesignTextField(
             text: .constant(""),
-            placeholder: "Bordered",
-            theme: DesignTextFieldTheme(
-                backgroundColor: .white,
-                borderColor: .blue,
-                borderWidth: 1
-            )
+            placeholder: "Default theme"
         )
         
-        // Custom Font & Color
         DesignTextField(
             text: .constant(""),
-            placeholder: "Custom Font",
-            theme: DesignTextFieldTheme(
-                placeholderFont: .caption,
-                placeholderColor: .red
-            )
+            placeholder: "Bordered theme"
         )
         
-        // Image + Border
+        DesignTextField(
+            text: .constant(""),
+            placeholder: "Rounded theme"
+        )
         DesignTextField(
             text: .constant(""),
             placeholder: "Search...",
             image: "magnifyingglass",
-            theme: DesignTextFieldTheme(
-                backgroundColor: .white,
-                borderColor: .gray.opacity(0.5),
-                borderWidth: 1,
-                cornerRadius: 20
-            )
+            imagePosition: .leading
+        )
+        
+        DesignTextField(
+            text: .constant(""),
+            placeholder: "Email",
+            image: "envelope",
+            imagePosition: .trailing
+        )
+        DesignTextField(
+            text: .constant("invalid@"),
+            placeholder: "Email",
+            errorMessage: "Please enter a valid email"
+        )
+        
+        DesignTextField(
+            text: .constant(""),
+            placeholder: "Required field",
+            errorMessage: "This field is required"
         )
     }
     .padding()

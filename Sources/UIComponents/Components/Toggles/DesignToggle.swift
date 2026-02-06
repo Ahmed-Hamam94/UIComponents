@@ -7,38 +7,61 @@
 
 import SwiftUI
 
-public struct DesignToggle: View {
+public struct DesignToggle<T: ToggleThemeProtocol>: View {
     @Binding var isOn: Bool
     private let label: String?
-    private let theme: ToggleThemeProtocol
+    private let theme: T
     
     public init(
         isOn: Binding<Bool>,
         label: String? = nil,
-        theme: ToggleThemeProtocol = DesignToggleTheme()
+        theme: T
     ) {
         self._isOn = isOn
         self.label = label
         self.theme = theme
     }
     
-    public var body: some View {        
+    public var body: some View {
         HStack {
-            if let label = label {
+            if let label {
                 Text(label)
                     .font(theme.font)
-                    .foregroundColor(theme.textColor)
+                    .foregroundStyle(theme.textColor)
             }
             
             Spacer()
             
-            toggleCapsule
+            ToggleCapsule(isOn: $isOn, theme: theme)
         }
         .padding(.vertical, 4)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(label ?? "Toggle")
+        .accessibilityValue(isOn ? "On" : "Off")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityHint("Double tap to toggle")
     }
+}
+
+extension DesignToggle where T == DesignToggleTheme {
+    public init(
+        isOn: Binding<Bool>,
+        label: String? = nil,
+        theme: DesignToggleTheme = .default
+    ) {
+        self._isOn = isOn
+        self.label = label
+        self.theme = theme
+    }
+}
+
+// MARK: - Toggle Capsule View
+private struct ToggleCapsule<T: ToggleThemeProtocol>: View {
+    @Binding var isOn: Bool
+    let theme: T
     
-    private var toggleCapsule: some View {
-        Button(action: {
+    var body: some View {
+        SwiftUI.Button(action: {
             withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                 isOn.toggle()
             }
@@ -53,21 +76,20 @@ public struct DesignToggle: View {
                         .offset(x: isOn ? 10 : -10)
                 )
         }
-        .buttonStyle(PlainButtonStyle())
+        .buttonStyle(.plain)
     }
 }
 
-struct DesignToggle_Previews: PreviewProvider {
-    static var previews: some View {
-        VStack(spacing: 20) {
-            DesignToggle(isOn: .constant(true), label: "Notifications")
-            DesignToggle(isOn: .constant(false), label: "Dark Mode")
-            DesignToggle(
-                isOn: .constant(true),
-                label: "Custom Theme",
-                theme: DesignToggleTheme(onColor: .green)
-            )
-        }
-        .padding()
+#Preview("Toggle Themes") {
+    VStack(spacing: 20) {
+        DesignToggle(isOn: .constant(true), label: "Notifications On")
+        DesignToggle(isOn: .constant(false), label: "Notifications Off")
+        DesignToggle(isOn: .constant(true), label: "Default", theme: .default)
+        DesignToggle(
+            isOn: .constant(true),
+            label: "Green",
+            theme: DesignToggleTheme(onColor: .green)
+        )
     }
+    .padding()
 }

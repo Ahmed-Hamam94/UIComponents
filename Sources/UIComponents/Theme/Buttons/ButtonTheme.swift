@@ -57,7 +57,7 @@ public extension ButtonThemeProtocol where Self == ButtonTheme {
     
     static var secondary: ButtonTheme {
         ButtonTheme(
-            backgroundColor: Color(.systemGray5),
+            backgroundColor: Color.gray.opacity(0.2),
             foregroundColor: .primary,
             font: .title2
         )
