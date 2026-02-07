@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol CardThemeProtocol: Sendable {
+public protocol UICardThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
     var shadowColor: Color { get }
@@ -16,7 +16,7 @@ public protocol CardThemeProtocol: Sendable {
     var padding: CGFloat { get }
 }
 
-public struct DesignCardTheme: CardThemeProtocol, Sendable {
+public struct UICardTheme: UICardThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat
     public var shadowColor: Color
@@ -41,8 +41,8 @@ public struct DesignCardTheme: CardThemeProtocol, Sendable {
     }
 }
 
-public extension CardThemeProtocol where Self == DesignCardTheme {
-    static var `default`: DesignCardTheme {
-        DesignCardTheme()
+public extension UICardThemeProtocol where Self == UICardTheme {
+    static var `default`: UICardTheme {
+        UICardTheme()
     }
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol TextFieldThemeProtocol: Sendable {
+public protocol UITextFieldThemeProtocol: Sendable {
     // Typography
     var font: Font { get }
     var placeholderFont: Font { get }
@@ -39,7 +39,7 @@ public protocol TextFieldThemeProtocol: Sendable {
     var height: CGFloat { get }
 }
 
-public struct DesignTextFieldTheme: TextFieldThemeProtocol, Sendable {
+public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
     // Typography
     public var font: Font
     public var placeholderFont: Font

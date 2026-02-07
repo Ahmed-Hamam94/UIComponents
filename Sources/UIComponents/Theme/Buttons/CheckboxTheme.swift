@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol CheckboxThemeProtocol: Sendable {
+public protocol UICheckboxThemeProtocol: Sendable {
     var checkedColor: Color { get }
     var uncheckedBorderColor: Color { get }
     var checkmarkColor: Color { get }
@@ -18,7 +18,7 @@ public protocol CheckboxThemeProtocol: Sendable {
     var textColor: Color { get }
 }
 
-public struct DesignCheckboxTheme: CheckboxThemeProtocol, Sendable {
+public struct UICheckboxTheme: UICheckboxThemeProtocol, Sendable {
     public var checkedColor: Color
     public var uncheckedBorderColor: Color
     public var checkmarkColor: Color
@@ -49,20 +49,20 @@ public struct DesignCheckboxTheme: CheckboxThemeProtocol, Sendable {
     }
 }
 
-public extension CheckboxThemeProtocol where Self == DesignCheckboxTheme {
-    static var primary: DesignCheckboxTheme {
-        DesignCheckboxTheme()
+public extension UICheckboxThemeProtocol where Self == UICheckboxTheme {
+    static var primary: UICheckboxTheme {
+        UICheckboxTheme()
     }
     
-    static var secondary: DesignCheckboxTheme {
-        DesignCheckboxTheme(
+    static var secondary: UICheckboxTheme {
+        UICheckboxTheme(
             checkedColor: .secondary,
             uncheckedBorderColor: .secondary
         )
     }
     
-    static var success: DesignCheckboxTheme {
-        DesignCheckboxTheme(
+    static var success: UICheckboxTheme {
+        UICheckboxTheme(
             checkedColor: .green,
             uncheckedBorderColor: .green.opacity(0.5)
         )

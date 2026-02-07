@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-public protocol SkeletonThemeProtocol: Sendable {
+public protocol UISkeletonThemeProtocol: Sendable {
     var baseColor: Color { get }
     var highlightColor: Color { get }
     var animationDuration: Double { get }
 }
 
-public struct DesignSkeletonTheme: SkeletonThemeProtocol, Sendable {
+public struct UISkeletonTheme: UISkeletonThemeProtocol, Sendable {
     public var baseColor: Color
     public var highlightColor: Color
     public var animationDuration: Double
@@ -29,8 +29,8 @@ public struct DesignSkeletonTheme: SkeletonThemeProtocol, Sendable {
     }
 }
 
-public extension SkeletonThemeProtocol where Self == DesignSkeletonTheme {
-    static var `default`: DesignSkeletonTheme {
-        DesignSkeletonTheme()
+public extension UISkeletonThemeProtocol where Self == UISkeletonTheme {
+    static var `default`: UISkeletonTheme {
+        UISkeletonTheme()
     }
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol ToggleThemeProtocol: Sendable {
+public protocol UIToggleThemeProtocol: Sendable {
     var onColor: Color { get }
     var offColor: Color { get }
     var thumbColor: Color { get }
@@ -19,7 +19,7 @@ public protocol ToggleThemeProtocol: Sendable {
     var trackHeight: CGFloat { get }
 }
 
-public struct DesignToggleTheme: ToggleThemeProtocol, Sendable {
+public struct UIToggleTheme: UIToggleThemeProtocol, Sendable {
     public var onColor: Color
     public var offColor: Color
     public var thumbColor: Color
@@ -47,8 +47,8 @@ public struct DesignToggleTheme: ToggleThemeProtocol, Sendable {
     }
 }
 
-public extension ToggleThemeProtocol where Self == DesignToggleTheme {
-    static var `default`: DesignToggleTheme {
-        DesignToggleTheme()
+public extension UIToggleThemeProtocol where Self == UIToggleTheme {
+    static var `default`: UIToggleTheme {
+        UIToggleTheme()
     }
 }

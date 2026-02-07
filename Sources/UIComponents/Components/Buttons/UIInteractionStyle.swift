@@ -1,5 +1,5 @@
 //
-//  DesignInteractionStyle.swift
+//  UIInteractionStyle.swift
 //  UIComponents
 //
 //  Created by Ahmed Hamam on 07/02/2026.
@@ -8,8 +8,8 @@
 import SwiftUI
 
 //  Shared button style for design buttons (press opacity and scale).
-struct DesignInteractionStyle: ButtonStyle {
-    let theme: ButtonThemeProtocol
+struct UIInteractionStyle: ButtonStyle {
+    let theme: UIButtonThemeProtocol
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

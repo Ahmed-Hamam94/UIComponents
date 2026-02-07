@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol SegmentedThemeProtocol: Sendable {
+public protocol UISegmentedThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var selectedColor: Color { get }
     var textColor: Color { get }
@@ -18,7 +18,7 @@ public protocol SegmentedThemeProtocol: Sendable {
     var selectedCapsulePadding: CGFloat { get }
 }
 
-public struct DesignSegmentedTheme: SegmentedThemeProtocol, Sendable {
+public struct UISegmentedTheme: UISegmentedThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var selectedColor: Color
     public var textColor: Color
@@ -49,8 +49,8 @@ public struct DesignSegmentedTheme: SegmentedThemeProtocol, Sendable {
     }
 }
 
-public extension SegmentedThemeProtocol where Self == DesignSegmentedTheme {
-    static var `default`: DesignSegmentedTheme {
-        DesignSegmentedTheme()
+public extension UISegmentedThemeProtocol where Self == UISegmentedTheme {
+    static var `default`: UISegmentedTheme {
+        UISegmentedTheme()
     }
 }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol ToastThemeProtocol: Sendable {
+public protocol UIToastThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var textColor: Color { get }
     var font: Font { get }
@@ -17,7 +17,7 @@ public protocol ToastThemeProtocol: Sendable {
     var iconColor: Color { get }
 }
 
-public struct DesignToastTheme: ToastThemeProtocol, Sendable {
+public struct UIToastTheme: UIToastThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var textColor: Color
     public var font: Font
@@ -45,20 +45,20 @@ public struct DesignToastTheme: ToastThemeProtocol, Sendable {
     }
 }
 
-public extension ToastThemeProtocol where Self == DesignToastTheme {
-    static var `default`: DesignToastTheme {
-        DesignToastTheme()
+public extension UIToastThemeProtocol where Self == UIToastTheme {
+    static var `default`: UIToastTheme {
+        UIToastTheme()
     }
     
-    static var error: DesignToastTheme {
-        DesignToastTheme(iconColor: .red)
+    static var error: UIToastTheme {
+        UIToastTheme(iconColor: .red)
     }
     
-    static var success: DesignToastTheme {
-        DesignToastTheme(iconColor: .green)
+    static var success: UIToastTheme {
+        UIToastTheme(iconColor: .green)
     }
     
-    static var warning: DesignToastTheme {
-        DesignToastTheme(iconColor: .orange)
+    static var warning: UIToastTheme {
+        UIToastTheme(iconColor: .orange)
     }
 }

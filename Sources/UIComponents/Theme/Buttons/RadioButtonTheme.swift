@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol RadioButtonThemeProtocol: Sendable {
+public protocol UIRadioButtonThemeProtocol: Sendable {
     var selectedColor: Color { get }
     var unselectedBorderColor: Color { get }
     var size: CGFloat { get }
@@ -17,7 +17,7 @@ public protocol RadioButtonThemeProtocol: Sendable {
     var textColor: Color { get }
 }
 
-public struct DesignRadioButtonTheme: RadioButtonThemeProtocol, Sendable {
+public struct UIRadioButtonTheme: UIRadioButtonThemeProtocol, Sendable {
     public var selectedColor: Color
     public var unselectedBorderColor: Color
     public var size: CGFloat
@@ -45,20 +45,20 @@ public struct DesignRadioButtonTheme: RadioButtonThemeProtocol, Sendable {
     }
 }
 
-public extension RadioButtonThemeProtocol where Self == DesignRadioButtonTheme {
-    static var primary: DesignRadioButtonTheme {
-        DesignRadioButtonTheme()
+public extension UIRadioButtonThemeProtocol where Self == UIRadioButtonTheme {
+    static var primary: UIRadioButtonTheme {
+        UIRadioButtonTheme()
     }
     
-    static var secondary: DesignRadioButtonTheme {
-        DesignRadioButtonTheme(
+    static var secondary: UIRadioButtonTheme {
+        UIRadioButtonTheme(
             selectedColor: .secondary,
             unselectedBorderColor: .secondary
         )
     }
     
-    static var success: DesignRadioButtonTheme {
-        DesignRadioButtonTheme(
+    static var success: UIRadioButtonTheme {
+        UIRadioButtonTheme(
             selectedColor: .green,
             unselectedBorderColor: .green.opacity(0.5)
         )

@@ -28,7 +28,7 @@ public struct ValidatedTextField: View {
     let validationTrigger: ValidationTrigger
     let image: String?
     let imagePosition: ImagePosition
-    let theme: TextFieldThemeProtocol
+    let theme: UITextFieldThemeProtocol
     
     // Title styling
     let titleFont: Font
@@ -48,7 +48,7 @@ public struct ValidatedTextField: View {
         validationTrigger: ValidationTrigger = .onChange,
         image: String? = nil,
         imagePosition: ImagePosition = .leading,
-        theme: TextFieldThemeProtocol = DesignTextFieldTheme(),
+        theme: UITextFieldThemeProtocol = UITextFieldTheme(),
         titleFont: Font = .subheadline,
         titleColor: Color = .primary,
         errorFont: Font = .caption,
@@ -209,7 +209,7 @@ public struct ValidatedTextField: View {
                         ],
                         image: "envelope",
                         imagePosition: .leading,
-                        theme: DesignTextFieldTheme(
+                        theme: UITextFieldTheme(
                             backgroundColor: .white,
                             borderColor: .gray.opacity(0.3),
                             borderWidth: 1
@@ -228,7 +228,7 @@ public struct ValidatedTextField: View {
                         ],
                         image: "lock",
                         imagePosition: .leading,
-                        theme: DesignTextFieldTheme(
+                        theme: UITextFieldTheme(
                             backgroundColor: .white,
                             borderColor: .gray.opacity(0.3),
                             borderWidth: 1
@@ -247,7 +247,7 @@ public struct ValidatedTextField: View {
                         ],
                         image: "phone",
                         imagePosition: .leading,
-                        theme: DesignTextFieldTheme(
+                        theme: UITextFieldTheme(
                             backgroundColor: .white,
                             borderColor: .gray.opacity(0.3),
                             borderWidth: 1
@@ -276,7 +276,7 @@ public struct ValidatedTextField: View {
                         ],
                         image: "person",
                         imagePosition: .leading,
-                        theme: DesignTextFieldTheme(
+                        theme: UITextFieldTheme(
                             backgroundColor: .white,
                             borderColor: .gray.opacity(0.3),
                             borderWidth: 1
@@ -296,7 +296,7 @@ public struct ValidatedTextField: View {
                                 return ageInt >= 18 && ageInt <= 120
                             }, message: "Age must be a number between 18 and 120")
                         ],
-                        theme: DesignTextFieldTheme(
+                        theme: UITextFieldTheme(
                             backgroundColor: .white,
                             borderColor: .gray.opacity(0.3),
                             borderWidth: 1

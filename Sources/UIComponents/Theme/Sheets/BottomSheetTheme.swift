@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol BottomSheetThemeProtocol: Sendable {
+public protocol UIBottomSheetThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
     var handleColor: Color { get }
@@ -15,7 +15,7 @@ public protocol BottomSheetThemeProtocol: Sendable {
     var padding: CGFloat { get }
 }
 
-public struct DesignBottomSheetTheme: BottomSheetThemeProtocol, Sendable {
+public struct UIBottomSheetTheme: UIBottomSheetThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat
     public var handleColor: Color
@@ -37,8 +37,8 @@ public struct DesignBottomSheetTheme: BottomSheetThemeProtocol, Sendable {
     }
 }
 
-public extension BottomSheetThemeProtocol where Self == DesignBottomSheetTheme {
-    static var `default`: DesignBottomSheetTheme {
-        DesignBottomSheetTheme()
+public extension UIBottomSheetThemeProtocol where Self == UIBottomSheetTheme {
+    static var `default`: UIBottomSheetTheme {
+        UIBottomSheetTheme()
     }
 }

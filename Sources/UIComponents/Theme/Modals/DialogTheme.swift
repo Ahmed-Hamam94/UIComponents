@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol DialogThemeProtocol: Sendable {
+public protocol UIDialogThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
     var titleFont: Font { get }
@@ -19,7 +19,7 @@ public protocol DialogThemeProtocol: Sendable {
     var maxWidth: CGFloat { get }
 }
 
-public struct DesignDialogTheme: DialogThemeProtocol, Sendable {
+public struct UIDialogTheme: UIDialogThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat
     public var titleFont: Font
@@ -53,8 +53,8 @@ public struct DesignDialogTheme: DialogThemeProtocol, Sendable {
     }
 }
 
-public extension DialogThemeProtocol where Self == DesignDialogTheme {
-    static var `default`: DesignDialogTheme {
-        DesignDialogTheme()
+public extension UIDialogThemeProtocol where Self == UIDialogTheme {
+    static var `default`: UIDialogTheme {
+        UIDialogTheme()
     }
 }

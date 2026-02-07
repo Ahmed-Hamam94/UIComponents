@@ -1,5 +1,5 @@
 //
-//  DesignBottomSheet.swift
+//  UIBottomSheet.swift
 //  UIComponents
 //
 //  Created by Ahmed Hamam on 28/01/2026.
@@ -7,75 +7,77 @@
 
 import SwiftUI
 
-public struct DesignBottomSheet<Content: View, T: BottomSheetThemeProtocol>: View {
-    @Binding var isPresented: Bool
-    private let contentBuilder: () -> Content
-    private let theme: T
-    
-    @State private var offset: CGFloat = 0
-    
-    public init(
-        isPresented: Binding<Bool>,
-        theme: T,
-        @ViewBuilder content: @escaping () -> Content
-    ) {
-        self._isPresented = isPresented
-        self.theme = theme
-        self.contentBuilder = content
-    }
-    
-    public var body: some View {
-        if isPresented {
-            ZStack(alignment: .bottom) {
-                // Background Overlay
-                SwiftUI.Button {
-                    withAnimation {
-                        isPresented = false
-                    }
-                } label: {
-                    theme.overlayColor
-                        .ignoresSafeArea()
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Dismiss")
-                .accessibilityHint("Double tap to close")
-                
-                // Sheet Content
-                SheetContent(
-                    content: contentBuilder(),
-                    theme: theme,
-                    offset: offset,
-                    onDragChanged: { height in
-                        if height > 0 {
-                            offset = height
+extension UI {
+    public struct BottomSheet<Content: View, T: UIBottomSheetThemeProtocol>: View {
+        @Binding var isPresented: Bool
+        private let contentBuilder: () -> Content
+        private let theme: T
+        
+        @State private var offset: CGFloat = 0
+        
+        public init(
+            isPresented: Binding<Bool>,
+            theme: T,
+            @ViewBuilder content: @escaping () -> Content
+        ) {
+            self._isPresented = isPresented
+            self.theme = theme
+            self.contentBuilder = content
+        }
+        
+        public var body: some View {
+            if isPresented {
+                ZStack(alignment: .bottom) {
+                    // Background Overlay
+                    SwiftUI.Button {
+                        withAnimation {
+                            isPresented = false
                         }
-                    },
-                    onDragEnded: { height in
-                        if height > 100 {
+                    } label: {
+                        theme.overlayColor
+                            .ignoresSafeArea()
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Dismiss")
+                    .accessibilityHint("Double tap to close")
+                    
+                    // Sheet Content
+                    SheetContent(
+                        content: contentBuilder(),
+                        theme: theme,
+                        offset: offset,
+                        onDragChanged: { height in
+                            if height > 0 {
+                                offset = height
+                            }
+                        },
+                        onDragEnded: { height in
+                            if height > 100 {
+                                withAnimation {
+                                    isPresented = false
+                                }
+                            }
                             withAnimation {
-                                isPresented = false
+                                offset = 0
                             }
                         }
-                        withAnimation {
-                            offset = 0
-                        }
-                    }
-                )
-                .transition(.move(edge: .bottom))
+                    )
+                    .transition(.move(edge: .bottom))
+                }
+                .ignoresSafeArea(edges: .bottom)
+                .zIndex(100)
+                .accessibilityElement(children: .contain)
+                .accessibilityAddTraits(.isModal)
+                .accessibilityLabel("Bottom sheet")
             }
-            .ignoresSafeArea(edges: .bottom)
-            .zIndex(100)
-            .accessibilityElement(children: .contain)
-            .accessibilityAddTraits(.isModal)
-            .accessibilityLabel("Bottom sheet")
         }
     }
 }
 
-extension DesignBottomSheet where T == DesignBottomSheetTheme {
+extension UI.BottomSheet where T == UIBottomSheetTheme {
     public init(
         isPresented: Binding<Bool>,
-        theme: DesignBottomSheetTheme = .default,
+        theme: UIBottomSheetTheme = .default,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self._isPresented = isPresented
@@ -85,7 +87,7 @@ extension DesignBottomSheet where T == DesignBottomSheetTheme {
 }
 
 // MARK: - Sheet Content View
-private struct SheetContent<Content: View, T: BottomSheetThemeProtocol>: View {
+private struct SheetContent<Content: View, T: UIBottomSheetThemeProtocol>: View {
     let content: Content
     let theme: T
     let offset: CGFloat
@@ -139,7 +141,7 @@ private struct SheetHandle: View {
 }
 
 // MARK: - Bottom Sheet View Modifier
-private struct BottomSheetModifier<SheetContent: View, T: BottomSheetThemeProtocol>: ViewModifier {
+private struct BottomSheetModifier<SheetContent: View, T: UIBottomSheetThemeProtocol>: ViewModifier {
     @Binding var isPresented: Bool
     let theme: T
     @ViewBuilder let sheetContent: () -> SheetContent
@@ -147,15 +149,15 @@ private struct BottomSheetModifier<SheetContent: View, T: BottomSheetThemeProtoc
     func body(content: Content) -> some View {
         ZStack {
             content
-            DesignBottomSheet(isPresented: $isPresented, theme: theme, content: sheetContent)
+            UI.BottomSheet(isPresented: $isPresented, theme: theme, content: sheetContent)
         }
     }
 }
 
 public extension View {
-    func designBottomSheet<Content: View>(
+    func uiBottomSheet<Content: View>(
         isPresented: Binding<Bool>,
-        theme: DesignBottomSheetTheme = .default,
+        theme: UIBottomSheetTheme = .default,
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
         modifier(BottomSheetModifier(
@@ -165,7 +167,7 @@ public extension View {
         ))
     }
     
-    func designBottomSheet<Content: View, T: BottomSheetThemeProtocol>(
+    func uiBottomSheet<Content: View, T: UIBottomSheetThemeProtocol>(
         isPresented: Binding<Bool>,
         theme: T,
         @ViewBuilder content: @escaping () -> Content
@@ -180,14 +182,14 @@ public extension View {
 
 #Preview("Bottom Sheet") {
     Color.gray.opacity(0.1)
-        .designBottomSheet(isPresented: .constant(true)) {
+        .uiBottomSheet(isPresented: .constant(true)) {
             VStack(spacing: 20) {
                 Text("Bottom Sheet Title")
                     .font(.headline)
                 Text("This is a custom draggable bottom sheet. You can put any SwiftUI content here.")
                     .multilineTextAlignment(.center)
                 
-                DesignButton(title: "Done", style: .primary, action: {})
+                UI.Button(title: "Done", style: .primary, action: {})
                     .padding(.horizontal)
             }
         }

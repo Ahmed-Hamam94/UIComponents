@@ -2,84 +2,45 @@
 //  UIComponents.swift
 //  UIComponents
 //
-//  A Swift Package providing reusable, themeable UI components.
-//
 
 import SwiftUI
 
-// MARK: - Components
+/// The central namespace for the Design System.
+/// Use this namespace to access all components and themes.
+public enum UI {
+    /// The current version of the library.
+    public static let version = "1.0.0"
 
-// Buttons
-public typealias Button = DesignButton
-public typealias ImageButton = DesignImageButton
-public typealias Checkbox = DesignCheckboxButton
-public typealias RadioButton = DesignRadioButton
+    // MARK: - Themes Namespace
 
-// Text Fields (use DesignTextField; typealias TextField would shadow SwiftUI.TextField)
+    /// A centralized location for architectural discovery of themes.
+    /// You can use these typealiases to discover available theme types.
+    public enum Themes {
+        // Buttons & Selection
+        public typealias Button = UIButtonTheme
+        public typealias Checkbox = UICheckboxTheme
+        public typealias RadioButton = UIRadioButtonTheme
+        public typealias Toggle = UIToggleTheme
+        public typealias Segmented = UISegmentedTheme
+        
+        // Form Inputs
+        public typealias TextField = UITextFieldTheme
+        
+        // Display & Feedback
+        public typealias Badge = UIBadgeTheme
+        public typealias Card = UICardTheme
+        public typealias Skeleton = UISkeletonTheme
+        public typealias Toast = UIToastTheme
+        
+        // Modals & Layout
+        public typealias Dialog = UIDialogTheme
+        public typealias BottomSheet = UIBottomSheetTheme
+    }
 
-// Toggles (use DesignToggle; typealias Toggle would shadow SwiftUI.Toggle)
+    // MARK: - Validation Utilities
 
-// Containers
-public typealias Card = DesignCard
-
-// Badges
-public typealias Badge = DesignBadge
-
-// Pickers
-public typealias SegmentedControl = DesignSegmentedControl
-
-// Modals
-public typealias Dialog = DesignDialog
-
-// Sheets
-public typealias BottomSheet = DesignBottomSheet
-
-// Toasts
-public typealias Toast = DesignToast
-
-// Skeletons
-public typealias Skeleton = DesignSkeleton
-
-// MARK: - Themes Namespace
-
-/// Namespace for all theme protocols and default implementations.
-public enum Themes {
-    // Button Themes
-    public typealias Button = ButtonTheme
-    public typealias Checkbox = DesignCheckboxTheme
-    public typealias RadioButton = DesignRadioButtonTheme
-    
-    // TextField Theme
-    public typealias TextField = DesignTextFieldTheme
-    
-    // Toggle Theme
-    public typealias Toggle = DesignToggleTheme
-    
-    // Container Themes
-    public typealias Card = DesignCardTheme
-    
-    // Badge Theme
-    public typealias Badge = DesignBadgeTheme
-    
-    // Picker Themes
-    public typealias Segmented = DesignSegmentedTheme
-    
-    // Modal Themes
-    public typealias Dialog = DesignDialogTheme
-    
-    // Sheet Themes
-    public typealias BottomSheet = DesignBottomSheetTheme
-    
-    // Toast Theme
-    public typealias Toast = DesignToastTheme
-    
-    // Skeleton Theme
-    public typealias Skeleton = DesignSkeletonTheme
-}
-
-// MARK: - Validation
-
-/// Namespace for validation utilities.
-public enum Validation {
-    public typealias Rule = ValidationRule
+    /// Centralized access to validation rules and logic.
+    public enum Validation {
+        public typealias Rule = ValidationRule
+    }
 }

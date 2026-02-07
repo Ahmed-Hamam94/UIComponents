@@ -15,7 +15,7 @@ public struct PhoneNumberTextField: View {
     let placeholder: String
     let showCode: Bool
     let disabled: Bool
-    let theme: TextFieldThemeProtocol
+    let theme: UITextFieldThemeProtocol
         
     public init(
         phoneNumber: Binding<String>,
@@ -24,7 +24,7 @@ public struct PhoneNumberTextField: View {
         placeholder: String = "xxxxxxxx",
         showCode: Bool = true,
         disabled: Bool = false,
-        theme: TextFieldThemeProtocol = DesignTextFieldTheme()
+        theme: UITextFieldThemeProtocol = UITextFieldTheme()
     ) {
         self._phoneNumber = phoneNumber
         self._selectedCountry = selectedCountry
@@ -150,7 +150,7 @@ public struct PhoneNumberTextField: View {
         PhoneNumberTextField(
             phoneNumber: .constant("512345678"),
             selectedCountry: .constant(.uae),
-            theme: DesignTextFieldTheme(
+            theme: UITextFieldTheme(
                 backgroundColor: .white,
                 borderColor: .blue,
                 borderWidth: 1

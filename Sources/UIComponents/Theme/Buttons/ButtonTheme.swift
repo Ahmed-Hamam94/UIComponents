@@ -1,5 +1,5 @@
 //
-//  ButtonTheme.swift
+//  UIButtonTheme.swift
 //  UIComponents
 //
 //  Created by Ahmed Hamam on 16/10/2025.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol ButtonThemeProtocol: Sendable {
+public protocol UIButtonThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var disabledBackgroundColor: Color { get }
     var foregroundColor: Color { get }
@@ -17,7 +17,7 @@ public protocol ButtonThemeProtocol: Sendable {
     var pressedOpacity: Double { get }
 }
 
-public struct ButtonTheme: ButtonThemeProtocol, Sendable {
+public struct UIButtonTheme: UIButtonThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var disabledBackgroundColor: Color
     public var foregroundColor: Color
@@ -46,25 +46,25 @@ public struct ButtonTheme: ButtonThemeProtocol, Sendable {
 }
 
 // MARK: - Standard Themes
-public extension ButtonThemeProtocol where Self == ButtonTheme {
-    static var primary: ButtonTheme {
-        ButtonTheme(
+public extension UIButtonThemeProtocol where Self == UIButtonTheme {
+    static var primary: UIButtonTheme {
+        UIButtonTheme(
             backgroundColor: .blue,
             foregroundColor: .white,
             font: .title2
         )
     }
     
-    static var secondary: ButtonTheme {
-        ButtonTheme(
+    static var secondary: UIButtonTheme {
+        UIButtonTheme(
             backgroundColor: Color.gray.opacity(0.2),
             foregroundColor: .primary,
             font: .title2
         )
     }
     
-    static var destructive: ButtonTheme {
-        ButtonTheme(
+    static var destructive: UIButtonTheme {
+        UIButtonTheme(
             backgroundColor: .red,
             foregroundColor: .white,
             font: .title2

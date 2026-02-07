@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public protocol BadgeThemeProtocol: Sendable {
+public protocol UIBadgeThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var textColor: Color { get }
     var font: Font { get }
@@ -18,7 +18,7 @@ public protocol BadgeThemeProtocol: Sendable {
     var width: CGFloat { get }
 }
 
-public struct DesignBadgeTheme: BadgeThemeProtocol, Sendable {
+public struct UIBadgeTheme: UIBadgeThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var textColor: Color
     public var font: Font
@@ -49,20 +49,20 @@ public struct DesignBadgeTheme: BadgeThemeProtocol, Sendable {
     }
 }
 
-public extension BadgeThemeProtocol where Self == DesignBadgeTheme {
-    static var `default`: DesignBadgeTheme {
-        DesignBadgeTheme()
+public extension UIBadgeThemeProtocol where Self == UIBadgeTheme {
+    static var `default`: UIBadgeTheme {
+        UIBadgeTheme()
     }
     
-    static var success: DesignBadgeTheme {
-        DesignBadgeTheme(backgroundColor: .green, textColor: .white)
+    static var success: UIBadgeTheme {
+        UIBadgeTheme(backgroundColor: .green, textColor: .white)
     }
     
-    static var warning: DesignBadgeTheme {
-        DesignBadgeTheme(backgroundColor: .orange, textColor: .white)
+    static var warning: UIBadgeTheme {
+        UIBadgeTheme(backgroundColor: .orange, textColor: .white)
     }
     
-    static var error: DesignBadgeTheme {
-        DesignBadgeTheme(backgroundColor: .red, textColor: .white)
+    static var error: UIBadgeTheme {
+        UIBadgeTheme(backgroundColor: .red, textColor: .white)
     }
 }
