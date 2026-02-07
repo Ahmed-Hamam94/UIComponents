@@ -8,8 +8,6 @@ import SwiftUI
 /// The central namespace for the Design System.
 /// Use this namespace to access all components and themes.
 public enum UI {
-    /// The current version of the library.
-    public static let version = "1.0.0"
 
     // MARK: - Themes Namespace
 
@@ -36,6 +34,13 @@ public enum UI {
         public typealias Dialog = UIDialogTheme
         public typealias BottomSheet = UIBottomSheetTheme
     }
+
+    // MARK: - Models & General Types
+
+    public typealias Country = UIComponents.Country
+    public typealias ImagePosition = UIComponents.ImagePosition
+    public typealias ValidationTrigger = UIComponents.ValidationTrigger
+    public typealias ToastPosition = UIComponents.ToastPosition
 
     // MARK: - Validation Utilities
 

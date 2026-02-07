@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - Visibility Extensions
 
-public extension View {
+extension View {
     /// Conditionally hides a view.
     /// - Parameters:
     ///   - hidden: Whether the view should be hidden.
@@ -30,7 +30,7 @@ public extension View {
 
 // MARK: - Conditional Modifiers
 
-public extension View {
+extension View {
     /// Applies a transformation if the condition is true.
     /// - Parameters:
     ///   - condition: The condition to evaluate.
@@ -67,3 +67,4 @@ public extension View {
         }
     }
 }
+

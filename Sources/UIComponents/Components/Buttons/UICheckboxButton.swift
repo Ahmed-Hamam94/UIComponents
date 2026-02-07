@@ -9,7 +9,7 @@ import SwiftUI
 
 extension UI {
     public struct Checkbox<T: UICheckboxThemeProtocol>: View {
-        @Binding var isOn: Bool
+        @Binding private var isOn: Bool
         private let label: String?
         private let theme: T
         
