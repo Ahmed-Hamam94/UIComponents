@@ -7,7 +7,10 @@
 
 import Foundation
 
-/// A validation rule that checks a string value and returns an error message if invalid
+/// A validation rule that checks a string value and returns an error message if invalid.
+///
+/// When using custom closures (e.g. ``custom(_:message:)`` or ``matches(_:message:)``), keep validation logic
+/// main-actor safe if you pass rules across isolation boundaries or use strict concurrency.
 public struct ValidationRule {
     public let validate: (String) -> String?
     

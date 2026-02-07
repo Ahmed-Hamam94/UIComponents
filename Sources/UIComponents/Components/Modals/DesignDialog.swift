@@ -41,11 +41,15 @@ public struct DesignDialog<T: DialogThemeProtocol>: View {
         if isPresented {
             ZStack {
                 // Background Overlay
-                theme.overlayColor
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        isPresented = false
-                    }
+                SwiftUI.Button {
+                    isPresented = false
+                } label: {
+                    theme.overlayColor
+                        .ignoresSafeArea()
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Dismiss dialog")
+                .accessibilityHint("Double tap to close")
                 
                 // Dialog Box
                 DialogContent(

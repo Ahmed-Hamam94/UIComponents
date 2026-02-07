@@ -9,7 +9,7 @@ import SwiftUI
 
 public struct DesignBottomSheet<Content: View, T: BottomSheetThemeProtocol>: View {
     @Binding var isPresented: Bool
-    private let content: Content
+    private let contentBuilder: () -> Content
     private let theme: T
     
     @State private var offset: CGFloat = 0
@@ -21,24 +21,28 @@ public struct DesignBottomSheet<Content: View, T: BottomSheetThemeProtocol>: Vie
     ) {
         self._isPresented = isPresented
         self.theme = theme
-        self.content = content()
+        self.contentBuilder = content
     }
     
     public var body: some View {
         if isPresented {
             ZStack(alignment: .bottom) {
                 // Background Overlay
-                theme.overlayColor
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation {
-                            isPresented = false
-                        }
+                SwiftUI.Button {
+                    withAnimation {
+                        isPresented = false
                     }
+                } label: {
+                    theme.overlayColor
+                        .ignoresSafeArea()
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Dismiss")
+                .accessibilityHint("Double tap to close")
                 
                 // Sheet Content
                 SheetContent(
-                    content: content,
+                    content: contentBuilder(),
                     theme: theme,
                     offset: offset,
                     onDragChanged: { height in
@@ -68,17 +72,17 @@ public struct DesignBottomSheet<Content: View, T: BottomSheetThemeProtocol>: Vie
     }
 }
 
-//extension DesignBottomSheet where T == DesignBottomSheetTheme {
-//    public init(
-//        isPresented: Binding<Bool>,
-//        theme: DesignBottomSheetTheme = .default,
-//        @ViewBuilder content: @escaping () -> Content
-//    ) {
-//        self._isPresented = isPresented
-//        self.theme = theme
-//        self.content = content()
-//    }
-//}
+extension DesignBottomSheet where T == DesignBottomSheetTheme {
+    public init(
+        isPresented: Binding<Bool>,
+        theme: DesignBottomSheetTheme = .default,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self._isPresented = isPresented
+        self.theme = theme
+        self.contentBuilder = content
+    }
+}
 
 // MARK: - Sheet Content View
 private struct SheetContent<Content: View, T: BottomSheetThemeProtocol>: View {

@@ -55,7 +55,7 @@ public struct PhoneNumberTextField: View {
         }
         .frame(height: theme.height)
         .background(theme.backgroundColor)
-        .cornerRadius(theme.cornerRadius)
+        .clipShape(.rect(cornerRadius: theme.cornerRadius))
         .overlay(
             RoundedRectangle(cornerRadius: theme.cornerRadius)
                 .stroke(theme.borderColor, lineWidth: theme.borderWidth)
@@ -98,13 +98,13 @@ public struct PhoneNumberTextField: View {
             if showCode {
                 Text(selectedCountry.dialCode)
                     .font(theme.font)
-                    .foregroundColor(theme.textColor)
+                    .foregroundStyle(theme.textColor)
             }
             
             if hasMultipleCountries {
                 Image(systemName: "chevron.down")
                     .font(.caption)
-                    .foregroundColor(theme.placeholderColor)
+                    .foregroundStyle(theme.placeholderColor)
             }
         }
         .padding(.horizontal, 12)
@@ -116,7 +116,7 @@ public struct PhoneNumberTextField: View {
             if phoneNumber.isEmpty {
                 Text(placeholder)
                     .font(theme.placeholderFont)
-                    .foregroundColor(theme.placeholderColor)
+                    .foregroundStyle(theme.placeholderColor)
             }
             
             SwiftUI.TextField("", text: $phoneNumber)

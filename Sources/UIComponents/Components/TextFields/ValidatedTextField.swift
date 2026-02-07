@@ -16,6 +16,8 @@ public enum ValidationTrigger {
 public struct ValidatedTextField: View {
     @Binding var text: String
     @Binding var isValid: Bool
+    /// When using `validationTrigger: .manual`, pass a binding and increment its value to trigger validation (e.g. `triggerValidation += 1`).
+    @Binding var triggerValidation: Int
     
     @State private var internalError: String? = nil
     @State private var hasBeenEdited: Bool = false
@@ -39,6 +41,7 @@ public struct ValidatedTextField: View {
     public init(
         text: Binding<String>,
         isValid: Binding<Bool> = .constant(true),
+        triggerValidation: Binding<Int> = .constant(0),
         title: String,
         placeholder: String = "",
         validationRules: [ValidationRule] = [],
@@ -53,6 +56,7 @@ public struct ValidatedTextField: View {
     ) {
         self._text = text
         self._isValid = isValid
+        self._triggerValidation = triggerValidation
         self.title = title
         self.placeholder = placeholder
         self.validationRules = validationRules
@@ -67,7 +71,7 @@ public struct ValidatedTextField: View {
     }
     
     private var hasError: Bool {
-        internalError != nil && !internalError!.isEmpty
+        internalError.map { !$0.isEmpty } ?? false
     }
     
     private var effectiveBorderColor: Color {
@@ -83,7 +87,7 @@ public struct ValidatedTextField: View {
             // Title
             Text(title)
                 .font(titleFont)
-                .foregroundColor(titleColor)
+                .foregroundStyle(titleColor)
             
             // Text Field
             HStack(spacing: 8) {
@@ -95,7 +99,7 @@ public struct ValidatedTextField: View {
                     if text.isEmpty {
                         Text(placeholder)
                             .font(theme.placeholderFont)
-                            .foregroundColor(theme.placeholderColor)
+                            .foregroundStyle(theme.placeholderColor)
                     }
                     
                     SwiftUI.TextField("", text: $text)
@@ -116,6 +120,14 @@ public struct ValidatedTextField: View {
                                 }
                             }
                         }
+                        .onChange(of: triggerValidation) { _, newValue in
+                            if validationTrigger == .manual, newValue != 0 {
+                                hasBeenEdited = true
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    runValidation(text)
+                                }
+                            }
+                        }
                 }
                 
                 if let image = image, imagePosition == .trailing {
@@ -125,7 +137,7 @@ public struct ValidatedTextField: View {
             .padding(.horizontal, 12)
             .frame(height: theme.height)
             .background(theme.backgroundColor)
-            .cornerRadius(theme.cornerRadius)
+            .clipShape(.rect(cornerRadius: theme.cornerRadius))
             .overlay(
                 RoundedRectangle(cornerRadius: theme.cornerRadius)
                     .stroke(effectiveBorderColor, lineWidth: effectiveBorderWidth)
@@ -133,10 +145,10 @@ public struct ValidatedTextField: View {
             )
             
             // Error Message with Animation
-            if hasError && hasBeenEdited {
-                Text(internalError!)
+            if let error = internalError, hasBeenEdited, !error.isEmpty {
+                Text(error)
                     .font(errorFont)
-                    .foregroundColor(errorColor)
+                    .foregroundStyle(errorColor)
                     .transition(.asymmetric(
                         insertion: .opacity.combined(with: .move(edge: .top)),
                         removal: .opacity
@@ -148,7 +160,7 @@ public struct ValidatedTextField: View {
     
     private func imageView(_ name: String) -> some View {
         Image(systemName: name)
-            .foregroundColor(hasError ? errorColor : theme.placeholderColor)
+            .foregroundStyle(hasError ? errorColor : theme.placeholderColor)
     }
     
     private func runValidation(_ value: String) {
@@ -161,12 +173,6 @@ public struct ValidatedTextField: View {
         }
         internalError = nil
         isValid = true
-    }
-    
-    /// Call this method to manually trigger validation
-    public func validate() {
-        hasBeenEdited = true
-        runValidation(text)
     }
 }
 
@@ -310,7 +316,7 @@ public struct ValidatedTextField: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
                     .background(Color.white)
-                    .cornerRadius(8)
+                    .clipShape(.rect(cornerRadius: 8))
                 }
                 .padding()
             }

@@ -15,11 +15,9 @@ public typealias ImageButton = DesignImageButton
 public typealias Checkbox = DesignCheckboxButton
 public typealias RadioButton = DesignRadioButton
 
-// Text Fields
-public typealias TextField = DesignTextField
+// Text Fields (use DesignTextField; typealias TextField would shadow SwiftUI.TextField)
 
-// Toggles
-public typealias Toggle = DesignToggle
+// Toggles (use DesignToggle; typealias Toggle would shadow SwiftUI.Toggle)
 
 // Containers
 public typealias Card = DesignCard
@@ -48,9 +46,6 @@ public typealias Skeleton = DesignSkeleton
 public enum Themes {
     // Button Themes
     public typealias Button = ButtonTheme
-//    public typealias Primary = Primar
-//    public typealias Secondary = SecondaryTheme
-//    public typealias Destructive = DestructiveTheme
     public typealias Checkbox = DesignCheckboxTheme
     public typealias RadioButton = DesignRadioButtonTheme
     

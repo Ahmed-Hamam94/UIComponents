@@ -15,7 +15,7 @@ public protocol SegmentedThemeProtocol: Sendable {
     var font: Font { get }
     var cornerRadius: CGFloat { get }
     var height: CGFloat { get }
-    var selectedCapsulPadding: CGFloat { get }
+    var selectedCapsulePadding: CGFloat { get }
 }
 
 public struct DesignSegmentedTheme: SegmentedThemeProtocol, Sendable {
@@ -26,7 +26,7 @@ public struct DesignSegmentedTheme: SegmentedThemeProtocol, Sendable {
     public var font: Font
     public var cornerRadius: CGFloat
     public var height: CGFloat
-    public var selectedCapsulPadding: CGFloat
+    public var selectedCapsulePadding: CGFloat
     
     public init(
         backgroundColor: Color = .gray.opacity(0.15),
@@ -36,7 +36,7 @@ public struct DesignSegmentedTheme: SegmentedThemeProtocol, Sendable {
         font: Font = .subheadline.weight(.medium),
         cornerRadius: CGFloat = 8,
         height: CGFloat = 40,
-        selectedCapsulPadding: CGFloat = 6
+        selectedCapsulePadding: CGFloat = 6
     ) {
         self.backgroundColor = backgroundColor
         self.selectedColor = selectedColor
@@ -45,7 +45,7 @@ public struct DesignSegmentedTheme: SegmentedThemeProtocol, Sendable {
         self.font = font
         self.cornerRadius = cornerRadius
         self.height = height
-        self.selectedCapsulPadding = selectedCapsulPadding
+        self.selectedCapsulePadding = selectedCapsulePadding
     }
 }
 

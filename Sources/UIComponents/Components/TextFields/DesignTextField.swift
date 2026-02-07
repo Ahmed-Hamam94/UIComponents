@@ -73,7 +73,15 @@ public struct DesignTextField: View {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            textFieldContainer
+            TextFieldContainerView(
+                text: $text,
+                isFocused: $isFocused, placeholder: placeholder,
+                image: image,
+                imagePosition: imagePosition,
+                theme: theme,
+                hasError: hasError,
+                isEnabled: isEnabled
+            )
             
             if let errorMessage {
                 ErrorLabel(message: errorMessage, theme: theme)
@@ -84,8 +92,49 @@ public struct DesignTextField: View {
         .accessibilityValue(text.isEmpty ? "Empty" : text)
         .accessibilityHint(errorMessage ?? "")
     }
+}
+
+// MARK: - Text Field Container View
+private struct TextFieldContainerView: View {
+    @Binding var text: String
+    @FocusState.Binding var isFocused: Bool
+    let placeholder: String
+    let image: String?
+    let imagePosition: ImagePosition
+    let theme: TextFieldThemeProtocol
+    let hasError: Bool
+    let isEnabled: Bool
     
-    private var textFieldContainer: some View {
+    private var currentBackgroundColor: Color {
+        if !isEnabled {
+            return theme.disabledBackgroundColor
+        } else if hasError {
+            return theme.errorBackgroundColor
+        } else if isFocused {
+            return theme.focusBackgroundColor
+        }
+        return theme.backgroundColor
+    }
+    
+    private var currentBorderColor: Color {
+        if !isEnabled {
+            return theme.disabledBorderColor
+        } else if hasError {
+            return theme.errorBorderColor
+        } else if isFocused {
+            return theme.focusBorderColor
+        }
+        return theme.borderColor
+    }
+    
+    private var currentTextColor: Color {
+        if !isEnabled {
+            return theme.disabledTextColor
+        }
+        return theme.textColor
+    }
+    
+    var body: some View {
         HStack(spacing: 8) {
             if let image, imagePosition == .leading {
                 IconView(systemName: image, color: theme.iconColor)

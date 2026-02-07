@@ -68,12 +68,12 @@ private struct ToggleCapsule<T: ToggleThemeProtocol>: View {
         }) {
             Capsule()
                 .fill(isOn ? theme.onColor : theme.offColor)
-                .frame(width: 50, height: 30)
+                .frame(width: theme.trackWidth, height: theme.trackHeight)
                 .overlay(
                     Circle()
                         .fill(theme.thumbColor)
                         .padding(2)
-                        .offset(x: isOn ? 10 : -10)
+                        .offset(x: isOn ? (theme.trackWidth - theme.trackHeight) / 2 - 2 : -(theme.trackWidth - theme.trackHeight) / 2 + 2)
                 )
         }
         .buttonStyle(.plain)
@@ -88,7 +88,7 @@ private struct ToggleCapsule<T: ToggleThemeProtocol>: View {
         DesignToggle(
             isOn: .constant(true),
             label: "Green",
-            theme: DesignToggleTheme(onColor: .green)
+            theme: DesignToggleTheme(onColor: .green, offColor: .cyan, thumbColor: .blue, font: .body, textColor: .brown, trackWidth: 55, trackHeight: 30)
         )
     }
     .padding()

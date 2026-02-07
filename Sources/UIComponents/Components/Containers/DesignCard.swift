@@ -8,7 +8,7 @@
 import SwiftUI
 
 public struct DesignCard<Content: View, T: CardThemeProtocol>: View {
-    private let content: Content
+    private let contentBuilder: () -> Content
     private let theme: T
     private let accessibilityLabel: String?
     
@@ -19,11 +19,11 @@ public struct DesignCard<Content: View, T: CardThemeProtocol>: View {
     ) {
         self.theme = theme
         self.accessibilityLabel = accessibilityLabel
-        self.content = content()
+        self.contentBuilder = content
     }
     
     public var body: some View {
-        content
+        contentBuilder()
             .padding(theme.padding)
             .background(theme.backgroundColor)
             .clipShape(.rect(cornerRadius: theme.cornerRadius))
@@ -46,7 +46,7 @@ extension DesignCard where T == DesignCardTheme {
     ) {
         self.theme = theme
         self.accessibilityLabel = accessibilityLabel
-        self.content = content()
+        self.contentBuilder = content
     }
 }
 

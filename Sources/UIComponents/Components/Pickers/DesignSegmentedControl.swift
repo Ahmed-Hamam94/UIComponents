@@ -39,7 +39,7 @@ public struct DesignSegmentedControl<T: Hashable & Identifiable, S: SegmentedThe
                 
                 RoundedRectangle(cornerRadius: theme.cornerRadius - 2)
                     .fill(theme.selectedColor)
-                    .padding(theme.selectedCapsulPadding)
+                    .padding(theme.selectedCapsulePadding)
                     .frame(width: segmentWidth, height: theme.height)
                     .offset(x: segmentWidth * CGFloat(selectedIndex))
                     .animation(.spring(response: 0.3, dampingFraction: 0.8), value: selection)

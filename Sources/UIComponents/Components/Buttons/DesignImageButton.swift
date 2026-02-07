@@ -74,18 +74,6 @@ extension DesignImageButton where S == ButtonTheme {
     }
 }
 
-// MARK: - Interaction Style
-private struct DesignInteractionStyle: ButtonStyle {
-    let theme: ButtonThemeProtocol
-    
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .opacity(configuration.isPressed ? theme.pressedOpacity : 1.0)
-            .scaleEffect(configuration.isPressed ? 0.98 : 1.0)
-            .animation(.easeOut(duration: 0.2), value: configuration.isPressed)
-    }
-}
-
 // MARK: - Button Icon
 private struct ButtonIcon: View {
     let systemName: String
