@@ -21,9 +21,9 @@ public struct UISkeletonTheme: UISkeletonThemeProtocol, Sendable {
     public var animationDuration: Double
     
     public init(
-        baseColor: Color = .gray.opacity(0.2),
-        highlightColor: Color = .gray.opacity(0.3),
-        animationDuration: Double = 1.5
+        baseColor: Color = .gray.opacity(0.25),
+        highlightColor: Color = .white.opacity(0.6),
+        animationDuration: Double = 1.2
     ) {
         self.baseColor = baseColor
         self.highlightColor = highlightColor
