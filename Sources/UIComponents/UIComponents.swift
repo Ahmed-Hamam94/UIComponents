@@ -65,6 +65,9 @@ public enum UI {
     
     /// Specifies the anchor position for toast notifications.
     public typealias ToastPosition = UIComponents.ToastPosition
+    
+    /// Determines the visual style of segmented controls.
+    public typealias SegmentedStyle = UIComponents.UISegmentedControlStyle
 
     // MARK: - Validation Utilities
 

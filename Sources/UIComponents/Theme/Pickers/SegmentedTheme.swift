@@ -17,6 +17,7 @@ public protocol UISegmentedThemeProtocol: Sendable {
     var cornerRadius: CGFloat { get }
     var height: CGFloat { get }
     var selectedCapsulePadding: CGFloat { get }
+    var borderColor: Color { get }
 }
 
 /// A standard implementation of `UISegmentedThemeProtocol`.
@@ -29,6 +30,7 @@ public struct UISegmentedTheme: UISegmentedThemeProtocol, Sendable {
     public var cornerRadius: CGFloat
     public var height: CGFloat
     public var selectedCapsulePadding: CGFloat
+    public var borderColor: Color
     
     public init(
         backgroundColor: Color = .gray.opacity(0.15),
@@ -38,7 +40,8 @@ public struct UISegmentedTheme: UISegmentedThemeProtocol, Sendable {
         font: Font = .subheadline.weight(.medium),
         cornerRadius: CGFloat = 8,
         height: CGFloat = 40,
-        selectedCapsulePadding: CGFloat = 6
+        selectedCapsulePadding: CGFloat = 6,
+        borderColor: Color = .clear
     ) {
         self.backgroundColor = backgroundColor
         self.selectedColor = selectedColor
@@ -48,6 +51,7 @@ public struct UISegmentedTheme: UISegmentedThemeProtocol, Sendable {
         self.cornerRadius = cornerRadius
         self.height = height
         self.selectedCapsulePadding = selectedCapsulePadding
+        self.borderColor = borderColor
     }
 }
 
