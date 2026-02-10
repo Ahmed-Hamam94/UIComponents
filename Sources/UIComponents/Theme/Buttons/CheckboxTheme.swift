@@ -17,6 +17,8 @@ public protocol UICheckboxThemeProtocol: Sendable {
     var borderWidth: CGFloat { get }
     var font: Font { get }
     var textColor: Color { get }
+    /// The name of the SF Symbol used for the checkmark.
+    var checkmarkIcon: String { get }
 }
 
 /// A standard implementation of `UICheckboxThemeProtocol`.
@@ -29,6 +31,7 @@ public struct UICheckboxTheme: UICheckboxThemeProtocol, Sendable {
     public var borderWidth: CGFloat
     public var font: Font
     public var textColor: Color
+    public var checkmarkIcon: String
     
     public init(
         checkedColor: Color = .blue,
@@ -38,7 +41,8 @@ public struct UICheckboxTheme: UICheckboxThemeProtocol, Sendable {
         cornerRadius: CGFloat = 4,
         borderWidth: CGFloat = 2,
         font: Font = .body,
-        textColor: Color = .primary
+        textColor: Color = .primary,
+        checkmarkIcon: String = "checkmark"
     ) {
         self.checkedColor = checkedColor
         self.uncheckedBorderColor = uncheckedBorderColor
@@ -48,6 +52,7 @@ public struct UICheckboxTheme: UICheckboxThemeProtocol, Sendable {
         self.borderWidth = borderWidth
         self.font = font
         self.textColor = textColor
+        self.checkmarkIcon = checkmarkIcon
     }
 }
 

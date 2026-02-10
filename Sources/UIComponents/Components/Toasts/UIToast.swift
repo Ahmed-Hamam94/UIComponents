@@ -39,9 +39,11 @@ extension UI {
         }
         
         public var body: some View {
+            let displayedIcon = icon ?? theme.defaultIcon
+            
             HStack(spacing: 12) {
-                if let icon {
-                    Image(systemName: icon)
+                if let displayedIcon {
+                    Image(systemName: displayedIcon)
                         .foregroundStyle(theme.iconColor)
                 }
                 
@@ -150,7 +152,7 @@ public extension View {
                 message: "This is a toast message!",
                 icon: "checkmark.circle.fill",
                 position: .top,
-                theme: .success
+                theme: UIToastTheme(backgroundColor: .green.opacity(0.2), textColor: .white, font: .body, cornerRadius: 10, shadowColor: .gray, padding: 8, iconColor: .green)
             )
         
         UI.Toast(message: "Test", icon: "checkmark.circle.fill" , theme: .success)

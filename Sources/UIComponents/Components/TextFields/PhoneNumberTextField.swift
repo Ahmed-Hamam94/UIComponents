@@ -121,7 +121,7 @@ extension UI {
                 }
                 
                 if hasMultipleCountries {
-                    Image(systemName: "chevron.down")
+                    Image(systemName: theme.countrySelectorIcon)
                         .font(.caption)
                         .foregroundStyle(theme.placeholderColor)
                 }

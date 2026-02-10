@@ -41,6 +41,8 @@ public protocol UITextFieldThemeProtocol: Sendable {
     var borderWidth: CGFloat { get }
     var cornerRadius: CGFloat { get }
     var height: CGFloat { get }
+    /// The name of the SF Symbol used for the country selector dropdown.
+    var countrySelectorIcon: String { get }
 }
 
 /// A standard implementation of `UITextFieldThemeProtocol`.
@@ -74,6 +76,7 @@ public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
     public var borderWidth: CGFloat
     public var cornerRadius: CGFloat
     public var height: CGFloat
+    public var countrySelectorIcon: String
     
     public init(
         font: Font = .body,
@@ -93,7 +96,8 @@ public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
         disabledBorderColor: Color = .clear,
         borderWidth: CGFloat = 1,
         cornerRadius: CGFloat = 8,
-        height: CGFloat = 44
+        height: CGFloat = 44,
+        countrySelectorIcon: String = "chevron.down"
     ) {
         self.font = font
         self.placeholderFont = placeholderFont
@@ -113,5 +117,6 @@ public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
         self.borderWidth = borderWidth
         self.cornerRadius = cornerRadius
         self.height = height
+        self.countrySelectorIcon = countrySelectorIcon
     }
 }

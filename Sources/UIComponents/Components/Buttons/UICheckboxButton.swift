@@ -89,7 +89,7 @@ private struct CheckboxIcon<T: UICheckboxThemeProtocol>: View {
                     .fill(theme.checkedColor)
                     .frame(width: theme.size, height: theme.size)
                 
-                Image(systemName: "checkmark")
+                Image(systemName: theme.checkmarkIcon)
                     .font(.system(size: theme.size * 0.5, weight: .bold))
                     .foregroundStyle(theme.checkmarkColor)
             }
