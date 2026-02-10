@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a toast notification.
 public protocol UIToastThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var textColor: Color { get }
@@ -17,6 +18,7 @@ public protocol UIToastThemeProtocol: Sendable {
     var iconColor: Color { get }
 }
 
+/// A standard implementation of `UIToastThemeProtocol`.
 public struct UIToastTheme: UIToastThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var textColor: Color

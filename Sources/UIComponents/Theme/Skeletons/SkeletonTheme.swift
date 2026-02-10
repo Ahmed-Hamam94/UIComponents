@@ -7,12 +7,14 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties and animation of a skeleton loading view.
 public protocol UISkeletonThemeProtocol: Sendable {
     var baseColor: Color { get }
     var highlightColor: Color { get }
     var animationDuration: Double { get }
 }
 
+/// A standard implementation of `UISkeletonThemeProtocol`.
 public struct UISkeletonTheme: UISkeletonThemeProtocol, Sendable {
     public var baseColor: Color
     public var highlightColor: Color

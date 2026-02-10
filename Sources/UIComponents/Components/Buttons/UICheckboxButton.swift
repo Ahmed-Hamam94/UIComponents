@@ -8,9 +8,20 @@
 import SwiftUI
 
 extension UI {
+    /// A standard selection control for binary choices.
+    ///
+    /// The checkbox consists of a square icon with an optional checkmark and a label.
+    /// It supports custom themes via `UICheckboxThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.Checkbox(isOn: $agreed, label: "I accept the terms")
+    /// ```
     public struct Checkbox<T: UICheckboxThemeProtocol>: View {
+        /// A binding to the boolean state of the checkbox.
         @Binding private var isOn: Bool
+        /// Optional label displayed next to the checkbox icon.
         private let label: String?
+        /// The visual style of the checkbox.
         private let theme: T
         
         public init(

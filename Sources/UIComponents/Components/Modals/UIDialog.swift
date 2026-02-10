@@ -8,14 +8,27 @@
 import SwiftUI
 
 extension UI {
+    /// A modal component for critical user interruptions and confirmations.
+    ///
+    /// It is recommended to use the `.uiDialog(...)` view modifier instead of instantiating this struct directly.
+    /// The dialog includes a title, message, and up to two action buttons.
+    /// It supports custom themes via `UIDialogThemeProtocol`.
     public struct Dialog<T: UIDialogThemeProtocol>: View {
-        @Binding var isPresented: Bool
+        /// A binding to the presentation state of the dialog.
+        @Binding private var isPresented: Bool
+        /// The title text shown at the top of the dialog.
         private let title: String
+        /// The body message text.
         private let message: String
+        /// The label for the primary action button.
         private let primaryButton: String
+        /// The optional label for the secondary action button.
         private let secondaryButton: String?
+        /// The closure called when the primary button is tapped.
         private let primaryAction: () -> Void
+        /// The optional closure called when the secondary button is tapped.
         private let secondaryAction: (() -> Void)?
+        /// The visual style and behavior settings of the dialog.
         private let theme: T
         
         public init(

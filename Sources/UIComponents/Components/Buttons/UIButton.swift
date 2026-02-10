@@ -8,9 +8,22 @@
 import SwiftUI
 
 extension UI {
+    /// A highly customizable, accessible button component.
+    ///
+    /// The button supports custom theming via the `UIButtonThemeProtocol`.
+    /// Built-in press animations and accessibility traits are provided automatically.
+    ///
+    /// ```swift
+    /// UI.Button(title: "Log In", style: .primary) {
+    ///     print("Clicked")
+    /// }
+    /// ```
     public struct Button<S: UIButtonThemeProtocol>: View {
+        /// The text display on the button.
         private let title: String
+        /// The visual style of the button.
         private let style: S
+        /// The closure called when the button is tapped.
         private let action: () -> Void
         
         @Environment(\.isEnabled) private var isEnabled

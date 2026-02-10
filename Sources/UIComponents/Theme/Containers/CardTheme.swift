@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a card container.
 public protocol UICardThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
@@ -16,6 +17,7 @@ public protocol UICardThemeProtocol: Sendable {
     var padding: CGFloat { get }
 }
 
+/// A standard implementation of `UICardThemeProtocol`.
 public struct UICardTheme: UICardThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat

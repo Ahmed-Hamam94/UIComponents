@@ -7,12 +7,17 @@
 
 import Foundation
 
+/// A data model representing a country for use in phone number pickers and address forms.
 public struct Country: Identifiable, Equatable, Hashable, Sendable {
     public let id: UUID
-    public let code: String      // ISO country code (e.g., "SA", "US")
-    public let flag: String      // Emoji flag (e.g., "🇸🇦", "🇺🇸")
-    public let dialCode: String  // Dial code (e.g., "+966", "+1")
-    public let name: String      // Country name (e.g., "Saudi Arabia")
+    /// The ISO 3166-1 alpha-2 country code (e.g., "SA", "US").
+    public let code: String
+    /// The emoji representation of the country's flag (e.g., "🇸🇦", "🇺🇸").
+    public let flag: String
+    /// The international dial code prefix (e.g., "+966", "+1").
+    public let dialCode: String
+    /// The full localized name of the country.
+    public let name: String
     
     public init(code: String, flag: String, dialCode: String, name: String, id: UUID = UUID()) {
         self.id = id

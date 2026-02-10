@@ -7,14 +7,28 @@
 
 import SwiftUI
 
+/// Defines the geometric shape of a skeleton placeholder.
 public enum SkeletonShape: Sendable {
+    /// A rectangular shape with an optional corner radius.
     case rectangle(cornerRadius: CGFloat = 8)
+    /// A circular shape.
     case circle
 }
 
 extension UI {
+    /// An animated placeholder used to indicate that content is loading.
+    ///
+    /// Skeletons feature a shimmer animation and support different shapes (rectangle, circle).
+    /// They support custom themes via `UISkeletonThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.Skeleton(shape: .circle)
+    ///     .frame(width: 50, height: 50)
+    /// ```
     public struct Skeleton<T: UISkeletonThemeProtocol>: View {
+        /// The shape of the skeleton placeholder.
         private let shape: SkeletonShape
+        /// The visual style and animation settings of the skeleton.
         private let theme: T
         @State private var phase: CGFloat = 0
         

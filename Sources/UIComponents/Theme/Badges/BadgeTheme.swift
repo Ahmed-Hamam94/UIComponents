@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a badge indicator.
 public protocol UIBadgeThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var textColor: Color { get }
@@ -18,6 +19,7 @@ public protocol UIBadgeThemeProtocol: Sendable {
     var width: CGFloat { get }
 }
 
+/// A standard implementation of `UIBadgeThemeProtocol`.
 public struct UIBadgeTheme: UIBadgeThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var textColor: Color

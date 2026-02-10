@@ -7,18 +7,25 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a custom toggle switch.
 public protocol UIToggleThemeProtocol: Sendable {
+    /// The color of the track when the toggle is on.
     var onColor: Color { get }
+    /// The color of the track when the toggle is off.
     var offColor: Color { get }
+    /// The color of the sliding thumb.
     var thumbColor: Color { get }
+    /// The font used for the toggle's label.
     var font: Font { get }
+    /// The color of the label text.
     var textColor: Color { get }
-    /// Track width; use for accessibility or custom sizing.
+    /// The horizontal width of the toggle track.
     var trackWidth: CGFloat { get }
-    /// Track height; use for accessibility or custom sizing.
+    /// The vertical height of the toggle track.
     var trackHeight: CGFloat { get }
 }
 
+/// A standard implementation of `UIToggleThemeProtocol`.
 public struct UIToggleTheme: UIToggleThemeProtocol, Sendable {
     public var onColor: Color
     public var offColor: Color

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a modal dialog.
 public protocol UIDialogThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
@@ -19,6 +20,7 @@ public protocol UIDialogThemeProtocol: Sendable {
     var maxWidth: CGFloat { get }
 }
 
+/// A standard implementation of `UIDialogThemeProtocol`.
 public struct UIDialogTheme: UIDialogThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat

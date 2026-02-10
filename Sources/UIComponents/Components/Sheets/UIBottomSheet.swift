@@ -8,9 +8,16 @@
 import SwiftUI
 
 extension UI {
+    /// A draggable surface that slides up from the bottom of the screen.
+    ///
+    /// It is recommended to use the `.uiBottomSheet(...)` view modifier instead of instantiating this struct directly.
+    /// The bottom sheet supports interactive dismissal via dragging and custom themes via `UIBottomSheetThemeProtocol`.
     public struct BottomSheet<Content: View, T: UIBottomSheetThemeProtocol>: View {
-        @Binding var isPresented: Bool
+        /// A binding to the presentation state of the bottom sheet.
+        @Binding private var isPresented: Bool
+        /// A closure that returns the content to be displayed within the sheet.
         private let contentBuilder: () -> Content
+        /// The visual style and behavior settings of the bottom sheet.
         private let theme: T
         
         @State private var offset: CGFloat = 0

@@ -8,9 +8,20 @@
 import SwiftUI
 
 extension UI {
+    /// A selection control used for picking one option from a set.
+    ///
+    /// The radio button consists of a circular icon and an optional label.
+    /// It supports custom themes via `UIRadioButtonThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.RadioButton(isSelected: $selected, label: "Option A")
+    /// ```
     public struct RadioButton<T: UIRadioButtonThemeProtocol>: View {
+        /// A binding to the selection state of the radio button.
         @Binding private var isSelected: Bool
+        /// Optional label displayed next to the radio icon.
         private let label: String?
+        /// The visual style of the radio button.
         private let theme: T
         
         public init(

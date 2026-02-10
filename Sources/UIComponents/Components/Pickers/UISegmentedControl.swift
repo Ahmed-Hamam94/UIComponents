@@ -8,10 +8,26 @@
 import SwiftUI
 
 extension UI {
+    /// A horizontal control for selecting a single option from a set of segments.
+    ///
+    /// The control features a sliding background indicator for the selected segment.
+    /// It works with any type that conforms to `Hashable` and `Identifiable`.
+    ///
+    /// ```swift
+    /// UI.SegmentedControl(
+    ///     selection: $mode,
+    ///     options: modes,
+    ///     labelSelector: { $0.title }
+    /// )
+    /// ```
     public struct SegmentedControl<T: Hashable & Identifiable, S: UISegmentedThemeProtocol>: View {
+        /// A binding to the currently selected option.
         @Binding private var selection: T
+        /// The list of available options.
         private let options: [T]
+        /// A closure that returns the display string for a given option.
         private let labelSelector: (T) -> String
+        /// The visual style of the segmented control.
         private let theme: S
         
         public init(

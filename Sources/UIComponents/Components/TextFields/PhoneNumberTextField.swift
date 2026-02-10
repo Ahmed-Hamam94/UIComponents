@@ -8,15 +8,33 @@
 import SwiftUI
 
 extension UI {
+    /// A specialized text field for entering international phone numbers.
+    ///
+    /// The component includes a country picker with flags and dial codes.
+    /// It supports custom themes via `UITextFieldThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.PhoneNumberTextField(
+    ///     phoneNumber: $phone,
+    ///     selectedCountry: $country
+    /// )
+    /// ```
     public struct PhoneNumberTextField: View {
-        @Binding var phoneNumber: String
-        @Binding var selectedCountry: Country
+        /// A binding to the entered phone number string.
+        @Binding private var phoneNumber: String
+        /// A binding to the currently selected country.
+        @Binding private var selectedCountry: Country
         
-        let countries: [Country]
-        let placeholder: String
-        let showCode: Bool
-        let disabled: Bool
-        let theme: UITextFieldThemeProtocol
+        /// The list of available countries in the picker.
+        private let countries: [Country]
+        /// The placeholder text shown in the phone number input.
+        private let placeholder: String
+        /// Whether to show the country's dial code in the selector.
+        private let showCode: Bool
+        /// Whether the text field is disabled.
+        private let disabled: Bool
+        /// The visual style of the text field.
+        private let theme: UITextFieldThemeProtocol
             
         public init(
             phoneNumber: Binding<String>,

@@ -7,16 +7,29 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a button.
+///
+/// Implement this protocol to create custom button styles, or use `UIButtonTheme`.
 public protocol UIButtonThemeProtocol: Sendable {
+    /// The background color of the button in its normal state.
     var backgroundColor: Color { get }
+    /// The background color when the button is disabled.
     var disabledBackgroundColor: Color { get }
+    /// The color of the text or image inside the button.
     var foregroundColor: Color { get }
+    /// The radius used to round the button's corners.
     var cornerRadius: CGFloat { get }
+    /// The fixed vertical height of the button.
     var height: CGFloat { get }
+    /// The font used for the button's title.
     var font: Font { get }
+    /// The opacity of the button when it is being pressed.
     var pressedOpacity: Double { get }
 }
 
+/// A standard implementation of `UIButtonThemeProtocol`.
+///
+/// Use this struct to instantiate predefined themes or create ad-hoc button styles.
 public struct UIButtonTheme: UIButtonThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var disabledBackgroundColor: Color

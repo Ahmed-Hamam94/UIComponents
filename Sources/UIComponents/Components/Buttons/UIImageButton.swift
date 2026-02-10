@@ -8,12 +8,26 @@
 import SwiftUI
 
 extension UI {
+    /// A button component that displays an image alongside optional text.
+    ///
+    /// The image can be positioned to the leading or trailing side of the text.
+    /// It supports custom themes via `UIButtonThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.ImageButton(title: "Share", image: "square.and.arrow.up", action: { share() })
+    /// ```
     public struct ImageButton<S: UIButtonThemeProtocol>: View {
+        /// Optional text shown on the button.
         private let title: String?
+        /// The SF Symbol name for the button's image.
         private let image: String
+        /// The position of the image relative to the title.
         private let imagePosition: ImagePosition
+        /// The spacing between the image and the title.
         private let spacing: CGFloat
+        /// The visual style of the button.
         private let style: S
+        /// The closure called when the button is tapped.
         private let action: () -> Void
         
         @Environment(\.isEnabled) private var isEnabled

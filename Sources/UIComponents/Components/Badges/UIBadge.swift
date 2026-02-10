@@ -8,8 +8,19 @@
 import SwiftUI
 
 extension UI {
+    /// A compact status indicator used to highlight short, important information.
+    ///
+    /// Badges are typically used for status (e.g., "New", "Success") or numeric counts.
+    /// They support different visual styles via `UIBadgeThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.Badge("New")
+    /// UI.Badge("Success", theme: .success)
+    /// ```
     public struct Badge<T: UIBadgeThemeProtocol>: View {
+        /// The text content of the badge.
         private let text: String
+        /// The visual style of the badge.
         private let theme: T
         
         public init(

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a bottom sheet.
 public protocol UIBottomSheetThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var cornerRadius: CGFloat { get }
@@ -15,6 +16,7 @@ public protocol UIBottomSheetThemeProtocol: Sendable {
     var padding: CGFloat { get }
 }
 
+/// A standard implementation of `UIBottomSheetThemeProtocol`.
 public struct UIBottomSheetTheme: UIBottomSheetThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var cornerRadius: CGFloat

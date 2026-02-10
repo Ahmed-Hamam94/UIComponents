@@ -8,9 +8,19 @@
 import SwiftUI
 
 extension UI {
+    /// A custom toggle switch component with a premium look and feel.
+    ///
+    /// The toggle features smooth animated transitions and supports custom themes via `UIToggleThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.Toggle(isOn: $notificationsEnabled, label: "Enable Notifications")
+    /// ```
     public struct Toggle<T: UIToggleThemeProtocol>: View {
-        @Binding var isOn: Bool
+        /// A binding to the boolean state of the toggle.
+        @Binding private var isOn: Bool
+        /// Optional label displayed next to the toggle switch.
         private let label: String?
+        /// The visual style and animation settings of the toggle.
         private let theme: T
         
         public init(

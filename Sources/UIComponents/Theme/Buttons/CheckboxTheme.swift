@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a checkbox.
 public protocol UICheckboxThemeProtocol: Sendable {
     var checkedColor: Color { get }
     var uncheckedBorderColor: Color { get }
@@ -18,6 +19,7 @@ public protocol UICheckboxThemeProtocol: Sendable {
     var textColor: Color { get }
 }
 
+/// A standard implementation of `UICheckboxThemeProtocol`.
 public struct UICheckboxTheme: UICheckboxThemeProtocol, Sendable {
     public var checkedColor: Color
     public var uncheckedBorderColor: Color

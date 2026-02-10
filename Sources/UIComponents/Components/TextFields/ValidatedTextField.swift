@@ -7,37 +7,60 @@
 
 import SwiftUI
 
+/// Determines when validation logic is executed for a text field.
 public enum ValidationTrigger: Sendable {
-    case onChange      // Validate as user types
-    case onSubmit      // Validate when user submits/ends editing
-    case manual        // Only validate when explicitly called
+    /// Validate immediately as the user types each character.
+    case onChange
+    /// Validate only when the user submits or finishes editing the field.
+    case onSubmit
+    /// Only validate when the `triggerValidation` binding is manually incremented.
+    case manual
 }
 
 extension UI {
+    /// A text field component with integrated validation rules and error display.
+    ///
+    /// The component manages its own validation state based on the provided rules
+    /// and displays an animated error message when validation fails.
+    ///
+    /// ```swift
+    /// UI.ValidatedTextField(
+    ///     text: $email,
+    ///     title: "Email",
+    ///     validationRules: [.required(), .email()]
+    /// )
+    /// ```
     public struct ValidatedTextField: View {
-        @Binding var text: String
-        @Binding var isValid: Bool
-        /// When using `validationTrigger: .manual`, pass a binding and increment its value to trigger validation (e.g. `triggerValidation += 1`).
-        @Binding var triggerValidation: Int
+        /// A binding to the text string being edited.
+        @Binding private var text: String
+        /// A binding that reflects whether the current input is valid.
+        @Binding private var isValid: Bool
+        /// An incrementable trigger for manual validation.
+        @Binding private var triggerValidation: Int
         
         @State private var internalError: String? = nil
         @State private var hasBeenEdited: Bool = false
         
-        let title: String
-        let placeholder: String
-        let validationRules: [ValidationRule]
-        let validationTrigger: ValidationTrigger
-        let image: String?
-        let imagePosition: ImagePosition
-        let theme: UITextFieldThemeProtocol
+        /// The title label text displayed above the field.
+        private let title: String
+        /// The placeholder text shown in the input.
+        private let placeholder: String
+        /// A list of rules to validate against the input text.
+        private let validationRules: [ValidationRule]
+        /// When validation should be triggered.
+        private let validationTrigger: ValidationTrigger
+        /// Optional SF Symbol name for the input icon.
+        private let image: String?
+        /// Position of the icon relative to the text.
+        private let imagePosition: ImagePosition
+        /// The visual style of the text field.
+        private let theme: UITextFieldThemeProtocol
         
-        // Title styling
-        let titleFont: Font
-        let titleColor: Color
-        
-        // Error styling
-        let errorFont: Font
-        let errorColor: Color
+        // Styling Overrides
+        private let titleFont: Font
+        private let titleColor: Color
+        private let errorFont: Font
+        private let errorColor: Color
         
         public init(
             text: Binding<String>,

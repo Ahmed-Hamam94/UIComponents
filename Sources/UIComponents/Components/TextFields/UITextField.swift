@@ -8,15 +8,34 @@
 import SwiftUI
 
 extension UI {
+    /// A themed text input component with optional icon and error support.
+    ///
+    /// This component provides a premium alternative to standard SwiftUI TextFields, 
+    /// including built-in support for multiple states (Default, Focus, Error, Disabled).
+    ///
+    /// ```swift
+    /// UI.TextField(
+    ///     text: $email, 
+    ///     placeholder: "Email", 
+    ///     image: "envelope", 
+    ///     errorMessage: error
+    /// )
+    /// ```
     public struct TextField: View {
+        /// The text being edited.
         @Binding var text: String
         @FocusState private var isFocused: Bool
         @Environment(\.isEnabled) private var isEnabled
         
+        /// The placeholder text shown when the input is empty.
         private let placeholder: String
+        /// Optional SF Symbol name to show as an icon.
         private let image: String?
+        /// Position of the icon relative to the text.
         private let imagePosition: ImagePosition
+        /// Theme providing the colors and typography.
         private let theme: UITextFieldThemeProtocol
+        /// Optional error message to display below the field.
         private let errorMessage: String?
         
         public init(

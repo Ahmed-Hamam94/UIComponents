@@ -8,9 +8,22 @@
 import SwiftUI
 
 extension UI {
+    /// A container view that groups related content with a premium look.
+    ///
+    /// Cards provide a background, shadow, and corner radius to their content.
+    /// They support custom themes via `UICardThemeProtocol`.
+    ///
+    /// ```swift
+    /// UI.Card {
+    ///     Text("This is grouped content")
+    /// }
+    /// ```
     public struct Card<Content: View, T: UICardThemeProtocol>: View {
+        /// A closure that returns the content to be displayed within the card.
         private let contentBuilder: () -> Content
+        /// The visual style of the card.
         private let theme: T
+        /// Optional accessibility label for the card.
         private let accessibilityLabel: String?
         
         public init(

@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of text fields.
+///
+/// Implement this protocol to create custom text field styles that handle multiple states 
+/// (default, focus, error, disabled).
 public protocol UITextFieldThemeProtocol: Sendable {
     // Typography
     var font: Font { get }
@@ -39,6 +43,7 @@ public protocol UITextFieldThemeProtocol: Sendable {
     var height: CGFloat { get }
 }
 
+/// A standard implementation of `UITextFieldThemeProtocol`.
 public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
     // Typography
     public var font: Font

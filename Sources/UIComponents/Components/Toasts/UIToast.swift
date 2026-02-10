@@ -7,14 +7,25 @@
 
 import SwiftUI
 
+/// Determines where on the screen a toast notification is displayed.
 public enum ToastPosition: Sendable {
-    case top, bottom
+    /// The toast appears at the top of the screen.
+    case top
+    /// The toast appears at the bottom of the screen.
+    case bottom
 }
 
 extension UI {
+    /// A non-intrusive notification banner for status updates.
+    ///
+    /// It is recommended to use the `.uiToast(...)` view modifier instead of instantiating this struct directly.
+    /// Toasts support icons, custom themes (success, error, etc.), and top/bottom positioning.
     public struct Toast<T: UIToastThemeProtocol>: View {
+        /// The notification message text.
         private let message: String
+        /// Optional SF Symbol name to display as an icon.
         private let icon: String?
+        /// The visual style of the toast.
         private let theme: T
         
         public init(

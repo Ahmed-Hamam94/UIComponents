@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a radio button.
 public protocol UIRadioButtonThemeProtocol: Sendable {
     var selectedColor: Color { get }
     var unselectedBorderColor: Color { get }
@@ -17,6 +18,7 @@ public protocol UIRadioButtonThemeProtocol: Sendable {
     var textColor: Color { get }
 }
 
+/// A standard implementation of `UIRadioButtonThemeProtocol`.
 public struct UIRadioButtonTheme: UIRadioButtonThemeProtocol, Sendable {
     public var selectedColor: Color
     public var unselectedBorderColor: Color

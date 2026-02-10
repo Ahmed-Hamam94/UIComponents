@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// A protocol defining the visual properties of a segmented control.
 public protocol UISegmentedThemeProtocol: Sendable {
     var backgroundColor: Color { get }
     var selectedColor: Color { get }
@@ -18,6 +19,7 @@ public protocol UISegmentedThemeProtocol: Sendable {
     var selectedCapsulePadding: CGFloat { get }
 }
 
+/// A standard implementation of `UISegmentedThemeProtocol`.
 public struct UISegmentedTheme: UISegmentedThemeProtocol, Sendable {
     public var backgroundColor: Color
     public var selectedColor: Color
