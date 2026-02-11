@@ -23,24 +23,28 @@ extension UI {
         private let label: String?
         /// The visual style of the checkbox.
         private let theme: T
-        
+        /// Optional accessibility overrides. Nil = use defaults.
+        private let accessibility: UIAccessibility?
+
         public init(
             isOn: Binding<Bool>,
             label: String? = nil,
-            theme: T
+            theme: T,
+            accessibility: UIAccessibility? = nil
         ) {
             self._isOn = isOn
             self.label = label
             self.theme = theme
+            self.accessibility = accessibility
         }
-        
+
         public var body: some View {
             SwiftUI.Button(action: {
                 isOn.toggle()
             }) {
                 HStack(spacing: 12) {
                     CheckboxIcon(isOn: isOn, theme: theme)
-                    
+
                     if let label {
                         Text(label)
                             .font(theme.font)
@@ -50,10 +54,13 @@ extension UI {
             }
             .buttonStyle(.plain)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(label ?? "Checkbox")
-            .accessibilityValue(isOn ? "Checked" : "Unchecked")
-            .accessibilityAddTraits(.isButton)
-            .accessibilityHint("Double tap to toggle")
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: label ?? "Checkbox",
+                defaultValue: isOn ? "Checked" : "Unchecked",
+                defaultHint: "Double tap to toggle",
+                defaultTraits: .isButton
+            )
         }
     }
 }
@@ -62,11 +69,13 @@ extension UI.Checkbox where T == UICheckboxTheme {
     public init(
         isOn: Binding<Bool>,
         label: String? = nil,
-        theme: UICheckboxTheme = .primary
+        theme: UICheckboxTheme = .primary,
+        accessibility: UIAccessibility? = nil
     ) {
         self._isOn = isOn
         self.label = label
         self.theme = theme
+        self.accessibility = accessibility
     }
 }
 

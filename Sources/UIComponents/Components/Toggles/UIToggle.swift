@@ -22,17 +22,21 @@ extension UI {
         private let label: String?
         /// The visual style and animation settings of the toggle.
         private let theme: T
-        
+        /// Optional accessibility overrides. Nil = use defaults.
+        private let accessibility: UIAccessibility?
+
         public init(
             isOn: Binding<Bool>,
             label: String? = nil,
-            theme: T
+            theme: T,
+            accessibility: UIAccessibility? = nil
         ) {
             self._isOn = isOn
             self.label = label
             self.theme = theme
+            self.accessibility = accessibility
         }
-        
+
         public var body: some View {
             HStack {
                 if let label {
@@ -40,17 +44,20 @@ extension UI {
                         .font(theme.font)
                         .foregroundStyle(theme.textColor)
                 }
-                
+
                 Spacer()
-                
+
                 ToggleCapsule(isOn: $isOn, theme: theme)
             }
             .padding(.vertical, 4)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(label ?? "Toggle")
-            .accessibilityValue(isOn ? "On" : "Off")
-            .accessibilityAddTraits(.isButton)
-            .accessibilityHint("Double tap to toggle")
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: label ?? "Toggle",
+                defaultValue: isOn ? "On" : "Off",
+                defaultHint: "Double tap to toggle",
+                defaultTraits: .isButton
+            )
         }
     }
 }
@@ -59,11 +66,13 @@ extension UI.Toggle where T == UIToggleTheme {
     public init(
         isOn: Binding<Bool>,
         label: String? = nil,
-        theme: UIToggleTheme = .default
+        theme: UIToggleTheme = .default,
+        accessibility: UIAccessibility? = nil
     ) {
         self._isOn = isOn
         self.label = label
         self.theme = theme
+        self.accessibility = accessibility
     }
 }
 

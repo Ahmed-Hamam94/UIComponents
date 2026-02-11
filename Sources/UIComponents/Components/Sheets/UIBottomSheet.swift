@@ -19,19 +19,23 @@ extension UI {
         private let contentBuilder: () -> Content
         /// The visual style and behavior settings of the bottom sheet.
         private let theme: T
-        
+        /// Optional accessibility overrides for the sheet container. Nil = use defaults.
+        private let accessibility: UIAccessibility?
+
         @State private var offset: CGFloat = 0
-        
+
         public init(
             isPresented: Binding<Bool>,
             theme: T,
+            accessibility: UIAccessibility? = nil,
             @ViewBuilder content: @escaping () -> Content
         ) {
             self._isPresented = isPresented
             self.theme = theme
+            self.accessibility = accessibility
             self.contentBuilder = content
         }
-        
+
         public var body: some View {
             if isPresented {
                 ZStack(alignment: .bottom) {
@@ -45,9 +49,8 @@ extension UI {
                             .ignoresSafeArea()
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Dismiss")
-                    .accessibilityHint("Double tap to close")
-                    
+                    .uiAccessibility(nil, defaultLabel: "Dismiss", defaultHint: "Double tap to close")
+
                     // Sheet Content
                     SheetContent(
                         content: contentBuilder(),
@@ -74,8 +77,7 @@ extension UI {
                 .ignoresSafeArea(edges: .bottom)
                 .zIndex(100)
                 .accessibilityElement(children: .contain)
-                .accessibilityAddTraits(.isModal)
-                .accessibilityLabel("Bottom sheet")
+                .uiAccessibility(accessibility, defaultLabel: "Bottom sheet", defaultTraits: .isModal)
             }
         }
     }
@@ -85,10 +87,12 @@ extension UI.BottomSheet where T == UIBottomSheetTheme {
     public init(
         isPresented: Binding<Bool>,
         theme: UIBottomSheetTheme = .default,
+        accessibility: UIAccessibility? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self._isPresented = isPresented
         self.theme = theme
+        self.accessibility = accessibility
         self.contentBuilder = content
     }
 }

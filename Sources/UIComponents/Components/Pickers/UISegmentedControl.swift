@@ -49,21 +49,25 @@ extension UI {
         private let theme: S
         /// The layout style (rounded, circular, ghost, bordered, or pill).
         private let style: UISegmentedControlStyle
-        
+        /// Optional accessibility overrides for the control. Nil = use default (label: "Segmented control").
+        private let accessibility: UIAccessibility?
+
         @Namespace private var namespace
-        
+
         public init(
             selection: Binding<T>,
             options: [T],
             labelSelector: @escaping (T) -> String,
             theme: S,
-            style: UISegmentedControlStyle = .rounded
+            style: UISegmentedControlStyle = .rounded,
+            accessibility: UIAccessibility? = nil
         ) {
             self._selection = selection
             self.options = options
             self.labelSelector = labelSelector
             self.theme = theme
             self.style = style
+            self.accessibility = accessibility
         }
         
         private var cornerRadius: CGFloat {
@@ -127,7 +131,7 @@ extension UI {
                 }
             }
             .accessibilityElement(children: .contain)
-            .accessibilityLabel("Segmented control")
+            .uiAccessibility(accessibility, defaultLabel: "Segmented control")
         }
     }
 }
@@ -144,13 +148,15 @@ extension UI.SegmentedControl where S == UISegmentedTheme {
         options: [T],
         labelSelector: @escaping (T) -> String,
         theme: UISegmentedTheme = .default,
-        style: UISegmentedControlStyle = .rounded
+        style: UISegmentedControlStyle = .rounded,
+        accessibility: UIAccessibility? = nil
     ) {
         self._selection = selection
         self.options = options
         self.labelSelector = labelSelector
         self.theme = theme
         self.style = style
+        self.accessibility = accessibility
     }
 }
 

@@ -22,15 +22,19 @@ extension UI {
         private let text: String
         /// The visual style of the badge.
         private let theme: T
-        
+        /// Optional accessibility overrides. Nil = use default (label: "Badge: \(text)").
+        private let accessibility: UIAccessibility?
+
         public init(
             _ text: String,
-            theme: T
+            theme: T,
+            accessibility: UIAccessibility? = nil
         ) {
             self.text = text
             self.theme = theme
+            self.accessibility = accessibility
         }
-        
+
         public var body: some View {
             Text(text)
                 .font(theme.font)
@@ -40,7 +44,7 @@ extension UI {
                 .frame(minWidth: theme.width, minHeight: theme.height)
                 .background(theme.backgroundColor)
                 .clipShape(.rect(cornerRadius: theme.cornerRadius))
-                .accessibilityLabel("Badge: \(text)")
+                .uiAccessibility(accessibility, defaultLabel: "Badge: \(text)")
         }
     }
 }
@@ -48,10 +52,12 @@ extension UI {
 extension UI.Badge where T == UIBadgeTheme {
     public init(
         _ text: String,
-        theme: UIBadgeTheme = .default
+        theme: UIBadgeTheme = .default,
+        accessibility: UIAccessibility? = nil
     ) {
         self.text = text
         self.theme = theme
+        self.accessibility = accessibility
     }
 }
 

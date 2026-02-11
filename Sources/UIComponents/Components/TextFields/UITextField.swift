@@ -37,14 +37,17 @@ extension UI {
         private let theme: UITextFieldThemeProtocol
         /// Optional error message to display below the field.
         private let errorMessage: String?
-        
+        /// Optional accessibility overrides. Nil = use defaults (label: placeholder, value: text state, hint: error).
+        private let accessibility: UIAccessibility?
+
         public init(
             text: Binding<String>,
             placeholder: String,
             image: String? = nil,
             imagePosition: ImagePosition = .leading,
             theme: UITextFieldThemeProtocol = UITextFieldTheme(),
-            errorMessage: String? = nil
+            errorMessage: String? = nil,
+            accessibility: UIAccessibility? = nil
         ) {
             self._text = text
             self.placeholder = placeholder
@@ -52,6 +55,7 @@ extension UI {
             self.imagePosition = imagePosition
             self.theme = theme
             self.errorMessage = errorMessage
+            self.accessibility = accessibility
         }
         
         // MARK: - Computed State Properties
@@ -77,9 +81,12 @@ extension UI {
                 }
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(placeholder)
-            .accessibilityValue(text.isEmpty ? "Empty" : text)
-            .accessibilityHint(errorMessage ?? "")
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: placeholder,
+                defaultValue: text.isEmpty ? "Empty" : text,
+                defaultHint: errorMessage ?? ""
+            )
         }
     }
 }

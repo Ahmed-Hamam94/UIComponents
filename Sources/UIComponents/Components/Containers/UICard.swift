@@ -23,19 +23,23 @@ extension UI {
         private let contentBuilder: () -> Content
         /// The visual style of the card.
         private let theme: T
-        /// Optional accessibility label for the card.
+        /// Optional accessibility label for the card (used when accessibility is nil).
         private let accessibilityLabel: String?
-        
+        /// Optional accessibility overrides. Nil = use default (label from accessibilityLabel if set).
+        private let accessibility: UIAccessibility?
+
         public init(
             theme: T,
             accessibilityLabel: String? = nil,
+            accessibility: UIAccessibility? = nil,
             @ViewBuilder content: @escaping () -> Content
         ) {
             self.theme = theme
             self.accessibilityLabel = accessibilityLabel
+            self.accessibility = accessibility
             self.contentBuilder = content
         }
-        
+
         public var body: some View {
             contentBuilder()
                 .padding(theme.padding)
@@ -47,8 +51,8 @@ extension UI {
                     x: theme.shadowOffset.x,
                     y: theme.shadowOffset.y
                 )
-                .accessibilityElement(children: accessibilityLabel != nil ? .combine : .contain)
-                .accessibilityLabel(accessibilityLabel ?? "")
+                .accessibilityElement(children: (accessibility?.label ?? accessibilityLabel) != nil ? .combine : .contain)
+                .uiAccessibility(accessibility, defaultLabel: accessibilityLabel)
         }
     }
 }
@@ -57,10 +61,12 @@ extension UI.Card where T == UICardTheme {
     public init(
         theme: UICardTheme = .default,
         accessibilityLabel: String? = nil,
+        accessibility: UIAccessibility? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self.theme = theme
         self.accessibilityLabel = accessibilityLabel
+        self.accessibility = accessibility
         self.contentBuilder = content
     }
 }

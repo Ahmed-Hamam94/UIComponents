@@ -63,9 +63,13 @@ extension UI {
         private let titleColor: Color
         private let errorFont: Font
         private let errorColor: Color
-        
+        /// Optional accessibility overrides for the field. Nil = use defaults.
+        private let accessibility: UIAccessibility?
+        /// Optional accessibility overrides for the password visibility button (when isSecure). Nil = use defaults.
+        private let passwordVisibilityAccessibility: UIAccessibility?
+
         @State private var isPasswordRevealed: Bool = false
-        
+
         public init(
             text: Binding<String>,
             isValid: Binding<Bool> = .constant(true),
@@ -81,7 +85,9 @@ extension UI {
             titleFont: Font = .subheadline,
             titleColor: Color = .primary,
             errorFont: Font = .caption,
-            errorColor: Color = .red
+            errorColor: Color = .red,
+            accessibility: UIAccessibility? = nil,
+            passwordVisibilityAccessibility: UIAccessibility? = nil
         ) {
             self._text = text
             self._isValid = isValid
@@ -98,6 +104,8 @@ extension UI {
             self.titleColor = titleColor
             self.errorFont = errorFont
             self.errorColor = errorColor
+            self.accessibility = accessibility
+            self.passwordVisibilityAccessibility = passwordVisibilityAccessibility
         }
         
         private var hasError: Bool {
@@ -195,9 +203,16 @@ extension UI {
                         ))
                 }
             }
+            .accessibilityElement(children: .combine)
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: title,
+                defaultValue: text.isEmpty ? "Empty" : text,
+                defaultHint: internalError ?? ""
+            )
             .animation(.easeInOut(duration: 0.25), value: hasError)
         }
-        
+
         private func imageView(_ name: String) -> some View {
             Image(systemName: name)
                 .foregroundStyle(hasError ? errorColor : theme.placeholderColor)
@@ -216,8 +231,11 @@ extension UI {
                     .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(isPasswordRevealed ? "Hide password" : "Show password")
-            .accessibilityHint("Double tap to toggle password visibility")
+            .uiAccessibility(
+                passwordVisibilityAccessibility,
+                defaultLabel: isPasswordRevealed ? "Hide password" : "Show password",
+                defaultHint: "Double tap to toggle password visibility"
+            )
         }
         
         private func runValidation(_ value: String) {

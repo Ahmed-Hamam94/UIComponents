@@ -23,24 +23,28 @@ extension UI {
         private let label: String?
         /// The visual style of the radio button.
         private let theme: T
-        
+        /// Optional accessibility overrides. Nil = use defaults.
+        private let accessibility: UIAccessibility?
+
         public init(
             isSelected: Binding<Bool>,
             label: String? = nil,
-            theme: T
+            theme: T,
+            accessibility: UIAccessibility? = nil
         ) {
             self._isSelected = isSelected
             self.label = label
             self.theme = theme
+            self.accessibility = accessibility
         }
-        
+
         public var body: some View {
             SwiftUI.Button(action: {
                 isSelected.toggle()
             }) {
                 HStack(spacing: 12) {
                     RadioIcon(isSelected: isSelected, theme: theme)
-                    
+
                     if let label {
                         Text(label)
                             .font(theme.font)
@@ -50,10 +54,13 @@ extension UI {
             }
             .buttonStyle(.plain)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel(label ?? "Radio button")
-            .accessibilityValue(isSelected ? "Selected" : "Not selected")
-            .accessibilityAddTraits(.isButton)
-            .accessibilityHint("Double tap to select")
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: label ?? "Radio button",
+                defaultValue: isSelected ? "Selected" : "Not selected",
+                defaultHint: "Double tap to select",
+                defaultTraits: .isButton
+            )
         }
     }
 }
@@ -62,11 +69,13 @@ extension UI.RadioButton where T == UIRadioButtonTheme {
     public init(
         isSelected: Binding<Bool>,
         label: String? = nil,
-        theme: UIRadioButtonTheme = .primary
+        theme: UIRadioButtonTheme = .primary,
+        accessibility: UIAccessibility? = nil
     ) {
         self._isSelected = isSelected
         self.label = label
         self.theme = theme
+        self.accessibility = accessibility
     }
 }
 

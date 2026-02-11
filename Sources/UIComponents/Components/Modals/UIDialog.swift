@@ -30,7 +30,9 @@ extension UI {
         private let secondaryAction: (() -> Void)?
         /// The visual style and behavior settings of the dialog.
         private let theme: T
-        
+        /// Optional accessibility overrides for the dialog container. Nil = use defaults.
+        private let accessibility: UIAccessibility?
+
         public init(
             isPresented: Binding<Bool>,
             title: String,
@@ -39,7 +41,8 @@ extension UI {
             secondaryButton: String? = nil,
             primaryAction: @escaping () -> Void,
             secondaryAction: (() -> Void)? = nil,
-            theme: T
+            theme: T,
+            accessibility: UIAccessibility? = nil
         ) {
             self._isPresented = isPresented
             self.title = title
@@ -49,8 +52,9 @@ extension UI {
             self.primaryAction = primaryAction
             self.secondaryAction = secondaryAction
             self.theme = theme
+            self.accessibility = accessibility
         }
-        
+
         public var body: some View {
             if isPresented {
                 ZStack {
@@ -62,9 +66,8 @@ extension UI {
                             .ignoresSafeArea()
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Dismiss dialog")
-                    .accessibilityHint("Double tap to close")
-                    
+                    .uiAccessibility(nil, defaultLabel: "Dismiss dialog", defaultHint: "Double tap to close")
+
                     // Dialog Box
                     DialogContent(
                         title: title,
@@ -88,8 +91,7 @@ extension UI {
                 .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isPresented)
                 .zIndex(100)
                 .accessibilityElement(children: .contain)
-                .accessibilityAddTraits(.isModal)
-                .accessibilityLabel("Dialog: \(title)")
+                .uiAccessibility(accessibility, defaultLabel: "Dialog: \(title)", defaultTraits: .isModal)
             }
         }
     }
@@ -104,7 +106,8 @@ extension UI.Dialog where T == UIDialogTheme {
         secondaryButton: String? = nil,
         primaryAction: @escaping () -> Void,
         secondaryAction: (() -> Void)? = nil,
-        theme: UIDialogTheme = .default
+        theme: UIDialogTheme = .default,
+        accessibility: UIAccessibility? = nil
     ) {
         self._isPresented = isPresented
         self.title = title
@@ -114,6 +117,7 @@ extension UI.Dialog where T == UIDialogTheme {
         self.primaryAction = primaryAction
         self.secondaryAction = secondaryAction
         self.theme = theme
+        self.accessibility = accessibility
     }
 }
 

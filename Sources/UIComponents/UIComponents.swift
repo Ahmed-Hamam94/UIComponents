@@ -69,6 +69,9 @@ public enum UI {
     /// Determines the visual style of segmented controls.
     public typealias SegmentedStyle = UIComponents.UISegmentedControlStyle
 
+    /// Optional accessibility overrides for components (label, value, hint, traits).
+    public typealias Accessibility = UIAccessibility
+
     // MARK: - Validation Utilities
 
     /// Centralized access to validation rules and logic.

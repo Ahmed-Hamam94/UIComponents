@@ -29,15 +29,18 @@ extension UI {
         private let style: S
         /// The closure called when the button is tapped.
         private let action: () -> Void
-        
+        /// Optional accessibility overrides. Nil = use defaults (label: title ?? image, traits: .isButton).
+        private let accessibility: UIAccessibility?
+
         @Environment(\.isEnabled) private var isEnabled
-        
+
         public init(
             title: String? = nil,
             image: String,
             imagePosition: ImagePosition = .leading,
             spacing: CGFloat = 8,
             style: S,
+            accessibility: UIAccessibility? = nil,
             action: @escaping () -> Void
         ) {
             self.title = title
@@ -45,9 +48,10 @@ extension UI {
             self.imagePosition = imagePosition
             self.spacing = spacing
             self.style = style
+            self.accessibility = accessibility
             self.action = action
         }
-        
+
         public var body: some View {
             SwiftUI.Button(action: action) {
                 HStack(spacing: spacing) {
@@ -66,8 +70,7 @@ extension UI {
                 .clipShape(.rect(cornerRadius: style.cornerRadius))
             }
             .buttonStyle(UIInteractionStyle(theme: style))
-            .accessibilityLabel(title ?? image)
-            .accessibilityAddTraits(.isButton)
+            .uiAccessibility(accessibility, defaultLabel: title ?? image, defaultTraits: .isButton)
         }
     }
 }
@@ -79,6 +82,7 @@ extension UI.ImageButton where S == UIButtonTheme {
         imagePosition: ImagePosition = .leading,
         spacing: CGFloat = 8,
         style: UIButtonTheme = .primary,
+        accessibility: UIAccessibility? = nil,
         action: @escaping () -> Void
     ) {
         self.title = title
@@ -86,6 +90,7 @@ extension UI.ImageButton where S == UIButtonTheme {
         self.imagePosition = imagePosition
         self.spacing = spacing
         self.style = style
+        self.accessibility = accessibility
         self.action = action
     }
 }

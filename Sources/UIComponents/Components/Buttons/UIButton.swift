@@ -25,19 +25,23 @@ extension UI {
         private let style: S
         /// The closure called when the button is tapped.
         private let action: () -> Void
-        
+        /// Optional accessibility overrides. Nil = use defaults (label: title, traits: .isButton).
+        private let accessibility: UIAccessibility?
+
         @Environment(\.isEnabled) private var isEnabled
-        
+
         public init(
             title: String,
             style: S,
+            accessibility: UIAccessibility? = nil,
             action: @escaping () -> Void
         ) {
             self.title = title
             self.style = style
+            self.accessibility = accessibility
             self.action = action
         }
-        
+
         public var body: some View {
             SwiftUI.Button(action: action) {
                 Text(title)
@@ -49,8 +53,7 @@ extension UI {
                     .clipShape(.rect(cornerRadius: style.cornerRadius))
             }
             .buttonStyle(UIInteractionStyle(theme: style))
-            .accessibilityLabel(title)
-            .accessibilityAddTraits(.isButton)
+            .uiAccessibility(accessibility, defaultLabel: title, defaultTraits: .isButton)
         }
     }
 }
@@ -60,10 +63,12 @@ extension UI.Button where S == UIButtonTheme {
     public init(
         title: String,
         style: UIButtonTheme = .primary,
+        accessibility: UIAccessibility? = nil,
         action: @escaping () -> Void
     ) {
         self.title = title
         self.style = style
+        self.accessibility = accessibility
         self.action = action
     }
 }

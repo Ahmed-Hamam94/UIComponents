@@ -27,30 +27,34 @@ extension UI {
         private let icon: String?
         /// The visual style of the toast.
         private let theme: T
-        
+        /// Optional accessibility overrides. Nil = use defaults (label: "Notification: \(message)", traits: .isStaticText).
+        private let accessibility: UIAccessibility?
+
         public init(
             message: String,
             icon: String? = nil,
-            theme: T
+            theme: T,
+            accessibility: UIAccessibility? = nil
         ) {
             self.message = message
             self.icon = icon
             self.theme = theme
+            self.accessibility = accessibility
         }
-        
+
         public var body: some View {
             let displayedIcon = icon ?? theme.defaultIcon
-            
+
             HStack(spacing: 12) {
                 if let displayedIcon {
                     Image(systemName: displayedIcon)
                         .foregroundStyle(theme.iconColor)
                 }
-                
+
                 Text(message)
                     .font(theme.font)
                     .foregroundStyle(theme.textColor)
-                
+
                 Spacer(minLength: 0)
             }
             .padding(theme.padding)
@@ -59,8 +63,11 @@ extension UI {
             .shadow(color: theme.shadowColor, radius: 10, x: 0, y: 5)
             .padding(.horizontal, 20)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Notification: \(message)")
-            .accessibilityAddTraits(.isStaticText)
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: "Notification: \(message)",
+                defaultTraits: .isStaticText
+            )
         }
     }
 }
@@ -69,10 +76,12 @@ extension UI.Toast where T == UIToastTheme {
     public init(
         message: String,
         icon: String? = nil,
-        theme: UIToastTheme = .default
+        theme: UIToastTheme = .default,
+        accessibility: UIAccessibility? = nil
     ) {
         self.message = message
         self.icon = icon
+        self.accessibility = accessibility
         self.theme = theme
     }
 }
