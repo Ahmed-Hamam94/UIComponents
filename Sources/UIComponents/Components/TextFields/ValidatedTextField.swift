@@ -53,6 +53,8 @@ extension UI {
         private let image: String?
         /// Position of the icon relative to the text.
         private let imagePosition: ImagePosition
+        /// When true, input is masked (password) and an eye toggle is shown to reveal/hide.
+        private let isSecure: Bool
         /// The visual style of the text field.
         private let theme: UITextFieldThemeProtocol
         
@@ -61,6 +63,8 @@ extension UI {
         private let titleColor: Color
         private let errorFont: Font
         private let errorColor: Color
+        
+        @State private var isPasswordRevealed: Bool = false
         
         public init(
             text: Binding<String>,
@@ -72,6 +76,7 @@ extension UI {
             validationTrigger: ValidationTrigger = .onChange,
             image: String? = nil,
             imagePosition: ImagePosition = .leading,
+            isSecure: Bool = false,
             theme: UITextFieldThemeProtocol = UITextFieldTheme(),
             titleFont: Font = .subheadline,
             titleColor: Color = .primary,
@@ -87,6 +92,7 @@ extension UI {
             self.validationTrigger = validationTrigger
             self.image = image
             self.imagePosition = imagePosition
+            self.isSecure = isSecure
             self.theme = theme
             self.titleFont = titleFont
             self.titleColor = titleColor
@@ -126,35 +132,45 @@ extension UI {
                                 .foregroundStyle(theme.placeholderColor)
                         }
                         
-                        SwiftUI.TextField("", text: $text)
-                            .font(theme.font)
-                            .foregroundStyle(theme.textColor)
-                            .onChange(of: text) { _, newValue in
+                        Group {
+                            if isSecure, !isPasswordRevealed {
+                                SecureField("", text: $text)
+                                    .font(theme.font)
+                                    .foregroundStyle(theme.textColor)
+                            } else {
+                                SwiftUI.TextField("", text: $text)
+                                    .font(theme.font)
+                                    .foregroundStyle(theme.textColor)
+                            }
+                        }
+                        .onChange(of: text) { _, newValue in
+                            hasBeenEdited = true
+                            if validationTrigger == .onChange {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    runValidation(newValue)
+                                }
+                            }
+                        }
+                        .onSubmit {
+                            if validationTrigger == .onSubmit {
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    runValidation(text)
+                                }
+                            }
+                        }
+                        .onChange(of: triggerValidation) { _, newValue in
+                            if validationTrigger == .manual, newValue != 0 {
                                 hasBeenEdited = true
-                                if validationTrigger == .onChange {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        runValidation(newValue)
-                                    }
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    runValidation(text)
                                 }
                             }
-                            .onSubmit {
-                                if validationTrigger == .onSubmit {
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        runValidation(text)
-                                    }
-                                }
-                            }
-                            .onChange(of: triggerValidation) { _, newValue in
-                                if validationTrigger == .manual, newValue != 0 {
-                                    hasBeenEdited = true
-                                    withAnimation(.easeInOut(duration: 0.2)) {
-                                        runValidation(text)
-                                    }
-                                }
-                            }
+                        }
                     }
                     
-                    if let image = image, imagePosition == .trailing {
+                    if isSecure {
+                        passwordVisibilityButton
+                    } else if let image = image, imagePosition == .trailing {
                         imageView(image)
                     }
                 }
@@ -185,6 +201,23 @@ extension UI {
         private func imageView(_ name: String) -> some View {
             Image(systemName: name)
                 .foregroundStyle(hasError ? errorColor : theme.placeholderColor)
+        }
+        
+        @ViewBuilder
+        private var passwordVisibilityButton: some View {
+            SwiftUI.Button {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    isPasswordRevealed.toggle()
+                }
+            } label: {
+                Image(systemName: isPasswordRevealed ? "eye.slash" : "eye")
+                    .font(.body)
+                    .foregroundStyle(hasError ? errorColor : theme.iconColor)
+                    .contentTransition(.symbolEffect(.replace))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(isPasswordRevealed ? "Hide password" : "Show password")
+            .accessibilityHint("Double tap to toggle password visibility")
         }
         
         private func runValidation(_ value: String) {
@@ -235,7 +268,7 @@ extension UI {
                         )
                     )
                     
-                    // Password with min length
+                    // Password with min length and animated eye toggle
                     UI.ValidatedTextField(
                         text: $password,
                         isValid: $passwordValid,
@@ -247,6 +280,7 @@ extension UI {
                         ],
                         image: "lock",
                         imagePosition: .leading,
+                        isSecure: true,
                         theme: UITextFieldTheme(
                             backgroundColor: .white,
                             borderColor: .gray.opacity(0.3),
