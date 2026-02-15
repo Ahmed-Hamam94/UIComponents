@@ -31,6 +31,8 @@ extension UI {
         private let action: () -> Void
         /// Optional accessibility overrides. Nil = use defaults (label: title ?? image, traits: .isButton).
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         @Environment(\.isEnabled) private var isEnabled
 
@@ -41,6 +43,8 @@ extension UI {
             spacing: CGFloat = 8,
             style: S,
             accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil,
             action: @escaping () -> Void
         ) {
             self.title = title
@@ -49,6 +53,8 @@ extension UI {
             self.spacing = spacing
             self.style = style
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
             self.action = action
         }
 
@@ -63,8 +69,8 @@ extension UI {
                         ButtonIcon(systemName: image, font: style.font)
                     }
                 }
-                .frame(height: style.height)
-                .frame(maxWidth: title != nil ? .infinity : style.height)
+                .frame(width: width, height: height ?? style.height)
+                .if(width == nil) { $0.frame(maxWidth: title != nil ? .infinity : style.height) }
                 .background(isEnabled ? style.backgroundColor : style.disabledBackgroundColor)
                 .foregroundStyle(style.foregroundColor)
                 .clipShape(.rect(cornerRadius: style.cornerRadius))
@@ -83,6 +89,8 @@ extension UI.ImageButton where S == UIButtonTheme {
         spacing: CGFloat = 8,
         style: UIButtonTheme = .primary,
         accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
         action: @escaping () -> Void
     ) {
         self.title = title
@@ -91,6 +99,8 @@ extension UI.ImageButton where S == UIButtonTheme {
         self.spacing = spacing
         self.style = style
         self.accessibility = accessibility
+        self.width = width
+        self.height = height
         self.action = action
     }
 }

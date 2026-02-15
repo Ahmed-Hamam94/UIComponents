@@ -21,6 +21,8 @@ extension UI {
         private let theme: T
         /// Optional accessibility overrides for the sheet container. Nil = use defaults.
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         @State private var offset: CGFloat = 0
 
@@ -28,11 +30,15 @@ extension UI {
             isPresented: Binding<Bool>,
             theme: T,
             accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil,
             @ViewBuilder content: @escaping () -> Content
         ) {
             self._isPresented = isPresented
             self.theme = theme
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
             self.contentBuilder = content
         }
 
@@ -70,7 +76,9 @@ extension UI {
                             withAnimation {
                                 offset = 0
                             }
-                        }
+                        },
+                        width: width,
+                        height: height
                     )
                     .transition(.move(edge: .bottom))
                 }
@@ -88,11 +96,15 @@ extension UI.BottomSheet where T == UIBottomSheetTheme {
         isPresented: Binding<Bool>,
         theme: UIBottomSheetTheme = .default,
         accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self._isPresented = isPresented
         self.theme = theme
         self.accessibility = accessibility
+        self.width = width
+        self.height = height
         self.contentBuilder = content
     }
 }
@@ -104,6 +116,8 @@ private struct SheetContent<Content: View, T: UIBottomSheetThemeProtocol>: View 
     let offset: CGFloat
     let onDragChanged: (CGFloat) -> Void
     let onDragEnded: (CGFloat) -> Void
+    let width: CGFloat?
+    let height: CGFloat?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -112,7 +126,12 @@ private struct SheetContent<Content: View, T: UIBottomSheetThemeProtocol>: View 
             
             content
                 .padding([.horizontal, .bottom], theme.padding)
+            
+            if height != nil {
+                Spacer(minLength: 0)
+            }
         }
+        .frame(width: width, height: height)
         .frame(maxWidth: .infinity)
         .background(theme.backgroundColor)
         .clipShape(
@@ -155,12 +174,20 @@ private struct SheetHandle: View {
 private struct BottomSheetModifier<SheetContent: View, T: UIBottomSheetThemeProtocol>: ViewModifier {
     @Binding var isPresented: Bool
     let theme: T
+    let width: CGFloat?
+    let height: CGFloat?
     @ViewBuilder let sheetContent: () -> SheetContent
     
     func body(content: Content) -> some View {
         ZStack {
             content
-            UI.BottomSheet(isPresented: $isPresented, theme: theme, content: sheetContent)
+            UI.BottomSheet(
+                isPresented: $isPresented,
+                theme: theme,
+                width: width,
+                height: height,
+                content: sheetContent
+            )
         }
     }
 }
@@ -169,11 +196,15 @@ public extension View {
     func uiBottomSheet<Content: View>(
         isPresented: Binding<Bool>,
         theme: UIBottomSheetTheme = .default,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
         modifier(BottomSheetModifier(
             isPresented: isPresented,
             theme: theme,
+            width: width,
+            height: height,
             sheetContent: content
         ))
     }
@@ -181,11 +212,15 @@ public extension View {
     func uiBottomSheet<Content: View, T: UIBottomSheetThemeProtocol>(
         isPresented: Binding<Bool>,
         theme: T,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
         modifier(BottomSheetModifier(
             isPresented: isPresented,
             theme: theme,
+            width: width,
+            height: height,
             sheetContent: content
         ))
     }

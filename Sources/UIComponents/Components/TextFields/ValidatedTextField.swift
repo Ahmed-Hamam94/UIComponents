@@ -67,6 +67,8 @@ extension UI {
         private let accessibility: UIAccessibility?
         /// Optional accessibility overrides for the password visibility button (when isSecure). Nil = use defaults.
         private let passwordVisibilityAccessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         @State private var isPasswordRevealed: Bool = false
 
@@ -87,7 +89,9 @@ extension UI {
             errorFont: Font = .caption,
             errorColor: Color = .red,
             accessibility: UIAccessibility? = nil,
-            passwordVisibilityAccessibility: UIAccessibility? = nil
+            passwordVisibilityAccessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self._text = text
             self._isValid = isValid
@@ -106,6 +110,8 @@ extension UI {
             self.errorColor = errorColor
             self.accessibility = accessibility
             self.passwordVisibilityAccessibility = passwordVisibilityAccessibility
+            self.width = width
+            self.height = height
         }
         
         private var hasError: Bool {
@@ -183,7 +189,7 @@ extension UI {
                     }
                 }
                 .padding(.horizontal, 12)
-                .frame(height: theme.height)
+                .frame(width: width, height: height ?? theme.height)
                 .background(theme.backgroundColor)
                 .clipShape(.rect(cornerRadius: theme.cornerRadius))
                 .overlay(
@@ -322,7 +328,9 @@ extension UI {
                             backgroundColor: .white,
                             borderColor: .gray.opacity(0.3),
                             borderWidth: 1
-                        )
+                        ),
+                        width: 290,
+                        height: 50
                     )
                 }
                 .padding()

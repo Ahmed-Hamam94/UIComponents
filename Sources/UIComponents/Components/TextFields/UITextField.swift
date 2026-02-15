@@ -37,8 +37,9 @@ extension UI {
         private let theme: UITextFieldThemeProtocol
         /// Optional error message to display below the field.
         private let errorMessage: String?
-        /// Optional accessibility overrides. Nil = use defaults (label: placeholder, value: text state, hint: error).
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         public init(
             text: Binding<String>,
@@ -47,7 +48,9 @@ extension UI {
             imagePosition: ImagePosition = .leading,
             theme: UITextFieldThemeProtocol = UITextFieldTheme(),
             errorMessage: String? = nil,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self._text = text
             self.placeholder = placeholder
@@ -56,6 +59,8 @@ extension UI {
             self.theme = theme
             self.errorMessage = errorMessage
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
         }
         
         // MARK: - Computed State Properties
@@ -73,7 +78,9 @@ extension UI {
                     imagePosition: imagePosition,
                     theme: theme,
                     hasError: hasError,
-                    isEnabled: isEnabled
+                    isEnabled: isEnabled,
+                    width: width,
+                    height: height
                 )
                 
                 if let errorMessage {
@@ -101,6 +108,8 @@ private struct TextFieldContainerView: View {
     let theme: UITextFieldThemeProtocol
     let hasError: Bool
     let isEnabled: Bool
+    let width: CGFloat?
+    let height: CGFloat?
     
     private var currentBackgroundColor: Color {
         if !isEnabled {
@@ -155,7 +164,7 @@ private struct TextFieldContainerView: View {
             }
         }
         .padding(.horizontal, 12)
-        .frame(height: theme.height)
+        .frame(width: width, height: height ?? theme.height)
         .background(currentBackgroundColor)
         .clipShape(.rect(cornerRadius: theme.cornerRadius))
         .overlay(
@@ -206,7 +215,9 @@ private struct ErrorLabel: View {
         UI.TextField(
             text: .constant("invalid@"),
             placeholder: "Email",
-            errorMessage: "Please enter a valid email"
+            errorMessage: "Please enter a valid email",
+            width: 300,
+            height: 40
         )
     }
     .padding()

@@ -32,6 +32,8 @@ extension UI {
         private let theme: T
         /// Optional accessibility overrides for the dialog container. Nil = use defaults.
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         public init(
             isPresented: Binding<Bool>,
@@ -42,7 +44,9 @@ extension UI {
             primaryAction: @escaping () -> Void,
             secondaryAction: (() -> Void)? = nil,
             theme: T,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self._isPresented = isPresented
             self.title = title
@@ -53,6 +57,8 @@ extension UI {
             self.secondaryAction = secondaryAction
             self.theme = theme
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
         }
 
         public var body: some View {
@@ -82,9 +88,11 @@ extension UI {
                         onSecondary: {
                             secondaryAction?()
                             isPresented = false
-                        }
+                        },
+                        width: width,
+                        height: height
                     )
-                    .frame(maxWidth: theme.maxWidth)
+                    .if(width == nil) { $0.frame(maxWidth: theme.maxWidth) }
                     .padding(40)
                     .transition(.scale(scale: 0.9).combined(with: .opacity))
                 }
@@ -107,7 +115,9 @@ extension UI.Dialog where T == UIDialogTheme {
         primaryAction: @escaping () -> Void,
         secondaryAction: (() -> Void)? = nil,
         theme: UIDialogTheme = .default,
-        accessibility: UIAccessibility? = nil
+        accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) {
         self._isPresented = isPresented
         self.title = title
@@ -118,6 +128,8 @@ extension UI.Dialog where T == UIDialogTheme {
         self.secondaryAction = secondaryAction
         self.theme = theme
         self.accessibility = accessibility
+        self.width = width
+        self.height = height
     }
 }
 
@@ -130,6 +142,8 @@ private struct DialogContent<T: UIDialogThemeProtocol>: View {
     let theme: T
     let onPrimary: () -> Void
     let onSecondary: () -> Void
+    let width: CGFloat?
+    let height: CGFloat?
     
     var body: some View {
         VStack(spacing: 0) {
@@ -145,6 +159,7 @@ private struct DialogContent<T: UIDialogThemeProtocol>: View {
                     .multilineTextAlignment(.center)
             }
             .padding(24)
+            .frame(maxHeight: height != nil ? .infinity : nil)
             
             Divider()
             
@@ -167,6 +182,7 @@ private struct DialogContent<T: UIDialogThemeProtocol>: View {
                 }
             }
         }
+        .frame(width: width, height: height)
         .background(theme.backgroundColor)
         .clipShape(.rect(cornerRadius: theme.cornerRadius))
     }
@@ -182,6 +198,8 @@ private struct DialogModifier<T: UIDialogThemeProtocol>: ViewModifier {
     let primaryAction: () -> Void
     let secondaryAction: (() -> Void)?
     let theme: T
+    let width: CGFloat?
+    let height: CGFloat?
     
     func body(content: Content) -> some View {
         ZStack {
@@ -194,7 +212,9 @@ private struct DialogModifier<T: UIDialogThemeProtocol>: ViewModifier {
                 secondaryButton: secondaryButton,
                 primaryAction: primaryAction,
                 secondaryAction: secondaryAction,
-                theme: theme
+                theme: theme,
+                width: width,
+                height: height
             )
         }
     }
@@ -209,7 +229,9 @@ public extension View {
         secondaryButton: String? = nil,
         primaryAction: @escaping () -> Void,
         secondaryAction: (() -> Void)? = nil,
-        theme: UIDialogTheme = .default
+        theme: UIDialogTheme = .default,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) -> some View {
         modifier(DialogModifier(
             isPresented: isPresented,
@@ -219,7 +241,9 @@ public extension View {
             secondaryButton: secondaryButton,
             primaryAction: primaryAction,
             secondaryAction: secondaryAction,
-            theme: theme
+            theme: theme,
+            width: width,
+            height: height
         ))
     }
     
@@ -231,7 +255,9 @@ public extension View {
         secondaryButton: String? = nil,
         primaryAction: @escaping () -> Void,
         secondaryAction: (() -> Void)? = nil,
-        theme: T
+        theme: T,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) -> some View {
         modifier(DialogModifier(
             isPresented: isPresented,
@@ -241,7 +267,9 @@ public extension View {
             secondaryButton: secondaryButton,
             primaryAction: primaryAction,
             secondaryAction: secondaryAction,
-            theme: theme
+            theme: theme,
+            width: width,
+            height: height
         ))
     }
 }
@@ -255,6 +283,8 @@ public extension View {
             primaryButton: "Confirm",
             secondaryButton: "Cancel",
             primaryAction: {},
-            theme: .default
+            theme: .default,
+            width: 380,
+         //   height: 300
         )
 }

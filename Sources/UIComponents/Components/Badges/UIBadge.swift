@@ -24,15 +24,21 @@ extension UI {
         private let theme: T
         /// Optional accessibility overrides. Nil = use default (label: "Badge: \(text)").
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         public init(
             _ text: String,
             theme: T,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self.text = text
             self.theme = theme
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
         }
 
         public var body: some View {
@@ -41,7 +47,9 @@ extension UI {
                 .foregroundStyle(theme.textColor)
                 .padding(.horizontal, theme.horizontalPadding)
                 .padding(.vertical, theme.verticalPadding)
-                .frame(minWidth: theme.width, minHeight: theme.height)
+                .frame(width: width, height: height)
+                .if(width == nil) { $0.frame(minWidth: theme.width) }
+                .if(height == nil) { $0.frame(minHeight: theme.height) }
                 .background(theme.backgroundColor)
                 .clipShape(.rect(cornerRadius: theme.cornerRadius))
                 .uiAccessibility(accessibility, defaultLabel: "Badge: \(text)")
@@ -53,11 +61,15 @@ extension UI.Badge where T == UIBadgeTheme {
     public init(
         _ text: String,
         theme: UIBadgeTheme = .default,
-        accessibility: UIAccessibility? = nil
+        accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) {
         self.text = text
         self.theme = theme
         self.accessibility = accessibility
+        self.width = width
+        self.height = height
     }
 }
 
@@ -66,7 +78,7 @@ extension UI.Badge where T == UIBadgeTheme {
         UI.Badge("New")
         UI.Badge("Success", theme: .success)
         UI.Badge("Warning", theme: .warning)
-        UI.Badge("Error", theme: .error)
+        UI.Badge("Error", theme: .error, width: 90, height: 30)
     }
     .padding()
 }

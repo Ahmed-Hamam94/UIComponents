@@ -29,17 +29,23 @@ extension UI {
         private let theme: T
         /// Optional accessibility overrides. Nil = use defaults (label: "Notification: \(message)", traits: .isStaticText).
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         public init(
             message: String,
             icon: String? = nil,
             theme: T,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self.message = message
             self.icon = icon
             self.theme = theme
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
         }
 
         public var body: some View {
@@ -57,6 +63,7 @@ extension UI {
 
                 Spacer(minLength: 0)
             }
+            .frame(width: width, height: height)
             .padding(theme.padding)
             .background(theme.backgroundColor)
             .clipShape(.rect(cornerRadius: theme.cornerRadius))
@@ -77,12 +84,16 @@ extension UI.Toast where T == UIToastTheme {
         message: String,
         icon: String? = nil,
         theme: UIToastTheme = .default,
-        accessibility: UIAccessibility? = nil
+        accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) {
         self.message = message
         self.icon = icon
         self.accessibility = accessibility
         self.theme = theme
+        self.width = width
+        self.height = height
     }
 }
 
@@ -94,13 +105,15 @@ private struct ToastModifier<T: UIToastThemeProtocol>: ViewModifier {
     let position: ToastPosition
     let duration: Double
     let theme: T
+    let width: CGFloat?
+    let height: CGFloat?
     
     func body(content: Content) -> some View {
         ZStack(alignment: position == .top ? .top : .bottom) {
             content
             
             if isPresented {
-                UI.Toast(message: message, icon: icon, theme: theme)
+                UI.Toast(message: message, icon: icon, theme: theme, width: width, height: height)
                     .transition(.move(edge: position == .top ? .top : .bottom).combined(with: .opacity))
                     .task {
                         try? await Task.sleep(for: .seconds(duration))
@@ -122,7 +135,9 @@ public extension View {
         icon: String? = nil,
         position: ToastPosition = .bottom,
         duration: Double = 3.0,
-        theme: UIToastTheme = .default
+        theme: UIToastTheme = .default,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) -> some View {
         modifier(ToastModifier(
             isPresented: isPresented,
@@ -130,7 +145,9 @@ public extension View {
             icon: icon,
             position: position,
             duration: duration,
-            theme: theme
+            theme: theme,
+            width: width,
+            height: height
         ))
     }
     
@@ -140,7 +157,9 @@ public extension View {
         icon: String? = nil,
         position: ToastPosition = .bottom,
         duration: Double = 3.0,
-        theme: T
+        theme: T,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) -> some View {
         modifier(ToastModifier(
             isPresented: isPresented,
@@ -148,7 +167,9 @@ public extension View {
             icon: icon,
             position: position,
             duration: duration,
-            theme: theme
+            theme: theme,
+            width: width,
+            height: height
         ))
     }
 }
@@ -161,7 +182,9 @@ public extension View {
                 message: "This is a toast message!",
                 icon: "checkmark.circle.fill",
                 position: .top,
-                theme: UIToastTheme(backgroundColor: .green.opacity(0.2), textColor: .white, font: .body, cornerRadius: 10, shadowColor: .gray, padding: 8, iconColor: .green)
+                theme: UIToastTheme(backgroundColor: .green.opacity(0.2), textColor: .white, font: .body, cornerRadius: 10, shadowColor: .gray, padding: 8, iconColor: .green),
+                width: 180,
+                height: 50
             )
         
         UI.Toast(message: "Test", icon: "checkmark.circle.fill" , theme: .success)

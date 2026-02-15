@@ -21,6 +21,49 @@ public enum UIProgressStepIcon: Sendable, ExpressibleByStringLiteral {
     }
 }
 
+/// Configuration for the stepped progress style.
+public struct UISteppedProgressConfig: Sendable {
+    public let iconSize: CGFloat
+    public let lineWidth: CGFloat
+    public let spacing: CGFloat
+    
+    public init(iconSize: CGFloat = 32, lineWidth: CGFloat = 2, spacing: CGFloat = 8) {
+        self.iconSize = iconSize
+        self.lineWidth = lineWidth
+        self.spacing = spacing
+    }
+    
+    public static let `default` = UISteppedProgressConfig()
+}
+
+/// Configuration for the order tracking progress style.
+public struct UIOrderTrackingConfig: Sendable {
+    public let iconSize: CGFloat
+    public let lineWidth: CGFloat
+    public let spacing: CGFloat
+    public let icons: [UIProgressStepIcon]?
+    public let subLabels: [String]?
+    public let subLabelsFont: Font?
+    
+    public init(
+        iconSize: CGFloat = 44,
+        lineWidth: CGFloat = 2,
+        spacing: CGFloat = 16,
+        icons: [UIProgressStepIcon]? = nil,
+        subLabels: [String]? = nil,
+        subLabelsFont: Font? = .caption
+    ) {
+        self.iconSize = iconSize
+        self.lineWidth = lineWidth
+        self.spacing = spacing
+        self.icons = icons
+        self.subLabels = subLabels
+        self.subLabelsFont = subLabelsFont
+    }
+    
+    public static let `default` = UIOrderTrackingConfig()
+}
+
 /// Defines the visual style and data of the progress bar.
 public enum UIProgressBarStyle: Sendable {
     /// A simple linear progress bar.
@@ -28,9 +71,9 @@ public enum UIProgressBarStyle: Sendable {
     /// A circular progress indicator.
     case circular(value: Double)
     /// A stepped progress bar for multi-stage processes.
-    case stepped(currentStep: Int, totalSteps: Int, labels: [String]? = nil)
-    /// A premium order tracking style with icons and timestamps.
-    case orderTracking(currentStep: Int, totalSteps: Int, labels: [String]? = nil, icons: [UIProgressStepIcon]? = nil, timestamps: [String]? = nil)
+    case stepped(currentStep: Int, totalSteps: Int, labels: [String]? = nil, config: UISteppedProgressConfig = .default)
+    /// A premium order tracking style with icons and sub-labels.
+    case orderTracking(currentStep: Int, totalSteps: Int, labels: [String]? = nil, config: UIOrderTrackingConfig = .default)
     /// A gradient-filled progress bar.
     case gradient(value: Double)
 }
@@ -58,13 +101,19 @@ extension UI {
         private let theme: T
         
         @State private var animatedValue: Double = 0
+        private let width: CGFloat?
+        private let height: CGFloat?
         
         public init(
             style: UIProgressBarStyle,
-            theme: T
+            theme: T,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self.style = style
             self.theme = theme
+            self.width = width
+            self.height = height
         }
         
         // Helper to extract normalized value (0-1) for animation
@@ -72,8 +121,8 @@ extension UI {
             switch style {
             case .linear(let value), .circular(let value), .gradient(let value):
                 return min(max(value, 0), 1)
-            case .stepped(let currentStep, let totalSteps, _), 
-                 .orderTracking(let currentStep, let totalSteps, _, _, _):
+            case .stepped(let currentStep, let totalSteps, _, _), 
+                 .orderTracking(let currentStep, let totalSteps, _, _):
                 return totalSteps > 0 ? Double(currentStep) / Double(totalSteps) : 0
             }
         }
@@ -85,10 +134,10 @@ extension UI {
                     linearProgress(value: value)
                 case .circular(let value):
                     circularProgress(value: value)
-                case .stepped(let currentStep, let totalSteps, let labels):
-                    steppedProgress(currentStep: currentStep, totalSteps: totalSteps, labels: labels)
-                case .orderTracking(let currentStep, let totalSteps, let labels, let icons, let timestamps):
-                    orderTrackingProgress(currentStep: currentStep, totalSteps: totalSteps, labels: labels, icons: icons, timestamps: timestamps)
+                case .stepped(let currentStep, let totalSteps, let labels, let config):
+                    steppedProgress(currentStep: currentStep, totalSteps: totalSteps, labels: labels, config: config)
+                case .orderTracking(let currentStep, let totalSteps, let labels, let config):
+                    orderTrackingProgress(currentStep: currentStep, totalSteps: totalSteps, labels: labels, config: config)
                 case .gradient(let value):
                     gradientProgress(value: value)
                 }
@@ -126,15 +175,17 @@ extension UI {
                             .frame(width: geo.size.width * animatedValue)
                     }
                 }
-                .frame(height: theme.height)
+                .frame(height: height ?? theme.height)
             }
+            .frame(width: width)
             .accessibilityLabel("Progress")
             .accessibilityValue("\(Int(value * 100)) percent")
         }
         
         // MARK: - Circular Progress
         private func circularProgress(value: Double) -> some View {
-            ZStack {
+            let size = min(width ?? 100, height ?? 100)
+            return ZStack {
                 // Background circle
                 Circle()
                     .stroke(theme.trackColor, lineWidth: theme.height)
@@ -152,15 +203,16 @@ extension UI {
                         .foregroundStyle(theme.textColor)
                 }
             }
+            .frame(width: size, height: size)
             .accessibilityLabel("Progress")
             .accessibilityValue("\(Int(value * 100)) percent")
         }
         
         // MARK: - Stepped Progress
-        private func steppedProgress(currentStep: Int, totalSteps: Int, labels: [String]?) -> some View {
+        private func steppedProgress(currentStep: Int, totalSteps: Int, labels: [String]?, config: UISteppedProgressConfig) -> some View {
             HStack(alignment: .top, spacing: 0) {
                 ForEach(0..<totalSteps, id: \.self) { step in
-                    VStack(spacing: 8) {
+                    VStack(spacing: config.spacing) {
                         // Step Icon + Lines
                         ZStack {
                             // Connecting Lines
@@ -176,30 +228,30 @@ extension UI {
                                         .fill(step < totalSteps - 1 && step < currentStep ? theme.fillColor : (step < totalSteps - 1 ? theme.trackColor : .clear))
                                         .frame(width: geo.size.width / 2)
                                 }
-                                .frame(height: 2)
-                                .offset(y: 15) // Center of 32px circle
+                                .frame(height: config.lineWidth)
+                                .offset(y: (config.iconSize / 2) - (config.lineWidth / 2))
                             }
-                            .frame(height: 32)
+                            .frame(height: config.iconSize)
                             
                             // Circle Icon
                             ZStack {
                                 Circle()
                                     .fill(step < currentStep ? theme.fillColor : theme.trackColor)
-                                    .frame(width: 32, height: 32)
+                                    .frame(width: config.iconSize, height: config.iconSize)
                                 
                                 if step < currentStep {
                                     Image(systemName: "checkmark")
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.system(size: config.iconSize * 0.45, weight: .bold))
                                         .foregroundStyle(.white)
                                 } else {
                                     Text("\(step + 1)")
-                                        .font(.caption.bold())
+                                        .font(.system(size: config.iconSize * 0.4, weight: .bold))
                                         .foregroundStyle(step == currentStep ? .white : theme.textColor.opacity(0.5))
                                 }
                             }
                             .overlay(
                                 Circle()
-                                    .stroke(step == currentStep ? theme.fillColor : .clear, lineWidth: 2)
+                                    .stroke(step == currentStep ? theme.fillColor : .clear, lineWidth: config.lineWidth)
                                     .scaleEffect(1.3)
                             )
                         }
@@ -207,7 +259,7 @@ extension UI {
                         // Label
                         if let labels = labels, step < labels.count {
                             Text(labels[step])
-                                .font(.caption) // Keep distinct from timestamps
+                                .font(theme.font)
                                 .fontWeight(step == currentStep ? .semibold : .regular)
                                 .foregroundStyle(step <= currentStep ? theme.textColor : theme.textColor.opacity(0.5))
                                 .multilineTextAlignment(.center)
@@ -222,71 +274,72 @@ extension UI {
         }
         
         // MARK: - Order Tracking Progress
-        private func orderTrackingProgress(currentStep: Int, totalSteps: Int, labels: [String]?, icons: [UIProgressStepIcon]?, timestamps: [String]?) -> some View {
-            VStack(alignment: .leading, spacing: 16) {
+        private func orderTrackingProgress(currentStep: Int, totalSteps: Int, labels: [String]?, config: UIOrderTrackingConfig) -> some View {
+            VStack(alignment: .leading, spacing: config.spacing) {
                 ForEach(0..<totalSteps, id: \.self) { step in
-                    HStack(alignment: .top, spacing: 16) {
+                    HStack(alignment: .center, spacing: config.spacing) {
                         // Timeline indicator
                         VStack(spacing: 0) {
                             // Icon circle
                             ZStack {
                                 Circle()
                                     .fill(step < currentStep ? theme.fillColor : theme.trackColor)
-                                    .frame(width: 44, height: 44)
+                                    .frame(width: config.iconSize, height: config.iconSize)
                                 
-                                if let icons = icons, step < icons.count {
+                                if let icons = config.icons, step < icons.count {
                                     switch icons[step] {
                                     case .system(let name):
                                         Image(systemName: name)
-                                            .font(.system(size: 18, weight: .semibold))
+                                            .font(.system(size: config.iconSize * 0.4, weight: .semibold))
                                             .foregroundStyle(step < currentStep ? .white : theme.textColor.opacity(0.5))
                                     case .asset(let name):
                                         Image(name)
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 20, height: 20)
+                                            .frame(width: config.iconSize * 0.45, height: config.iconSize * 0.45)
                                             .foregroundStyle(step < currentStep ? .white : theme.textColor.opacity(0.5))
                                     case .default:
                                         if step < currentStep {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .font(.system(size: 20))
+                                                .font(.system(size: config.iconSize * 0.45))
                                                 .foregroundStyle(.white)
                                         } else {
                                             Circle()
                                                 .fill(step == currentStep ? theme.fillColor.opacity(0.2) : .clear)
-                                                .frame(width: 12, height: 12)
+                                                .frame(width: config.iconSize * 0.27, height: config.iconSize * 0.27)
                                         }
                                     }
                                 } else if step < currentStep {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .font(.system(size: 20))
+                                        .font(.system(size: config.iconSize * 0.45))
                                         .foregroundStyle(.white)
                                 } else {
                                     Circle()
                                         .fill(step == currentStep ? theme.fillColor.opacity(0.2) : .clear)
-                                        .frame(width: 12, height: 12)
+                                        .frame(width: config.iconSize * 0.27, height: config.iconSize * 0.27)
                                 }
                             }
                             .overlay(
                                 Circle()
-                                    .stroke(step == currentStep ? theme.fillColor : .clear, lineWidth: 3)
+                                    .stroke(step == currentStep ? theme.fillColor : .clear, lineWidth: config.lineWidth * 1.5)
                                     .scaleEffect(1.15)
                             )
                             .shadow(
                                 color: step == currentStep ? theme.fillColor.opacity(0.3) : .clear,
-                                radius: 8,
+                                radius: config.iconSize * 0.18,
                                 x: 0,
-                                y: 4
+                                y: config.iconSize * 0.09
                             )
                             
                             // Connecting line
                             if step < totalSteps - 1 {
                                 Rectangle()
                                     .fill(step < currentStep - 1 ? theme.fillColor : theme.trackColor)
-                                    .frame(width: 2)
-                                    .frame(height: 40)
+                                    .frame(width: config.lineWidth)
+                                    .frame(height: config.iconSize * 0.9)
                             }
                         }
+                        .alignmentGuide(VerticalAlignment.center) { d in config.iconSize / 2 }
                         
                         // Content
                         VStack(alignment: .leading, spacing: 4) {
@@ -296,13 +349,12 @@ extension UI {
                                     .foregroundStyle(step <= currentStep ? theme.textColor : theme.textColor.opacity(0.5))
                             }
                             
-                            if let timestamps = timestamps, step < timestamps.count {
-                                Text(timestamps[step])
-                                    .font(.caption)
+                            if let subLabels = config.subLabels, step < subLabels.count {
+                                Text(subLabels[step])
+                                    .font(config.subLabelsFont ?? .caption)
                                     .foregroundStyle(step < currentStep ? theme.fillColor : theme.textColor.opacity(0.4))
                             }
                         }
-                        .padding(.top, 8)
                         
                         Spacer()
                     }
@@ -349,8 +401,9 @@ extension UI {
                             .clipShape(RoundedRectangle(cornerRadius: theme.cornerRadius))
                     }
                 }
-                .frame(height: theme.height)
+                .frame(height: height ?? theme.height)
             }
+            .frame(width: width)
             .accessibilityLabel("Progress")
             .accessibilityValue("\(Int(value * 100)) percent")
         }
@@ -361,10 +414,14 @@ extension UI {
 extension UI.ProgressBar where T == UIProgressTheme {
     public init(
         style: UIProgressBarStyle,
-        theme: UIProgressTheme = .default
+        theme: UIProgressTheme = .default,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) {
         self.style = style
         self.theme = theme
+        self.width = width
+        self.height = height
     }
 }
 
@@ -379,12 +436,9 @@ extension UI.ProgressBar where T == UIProgressTheme {
                 
                 UI.ProgressBar(
                     style: .linear(value: 0.65),
-                    theme: UIProgressTheme(showPercentage: true)
-                )
-                
-                UI.ProgressBar(
-                    style: .linear(value: 0.35),
-                    theme: UIProgressTheme(fillColor: .green, showPercentage: true)
+                    theme: UIProgressTheme(showPercentage: true),
+                    width: 300,
+                    height: 15
                 )
             }
             .padding()
@@ -401,13 +455,11 @@ extension UI.ProgressBar where T == UIProgressTheme {
                         style: .circular(value: 0.25),
                         theme: UIProgressTheme(height: 8, showPercentage: true)
                     )
-                    .frame(width: 80, height: 80)
                     
                     UI.ProgressBar(
                         style: .circular(value: 0.65),
-                        theme: UIProgressTheme(fillColor: .green, height: 10, showPercentage: true)
+                        theme: UIProgressTheme(fillColor: .green, height: 30, showPercentage: true)
                     )
-                    .frame(width: 100, height: 100)
                 }
             }
             .padding()
@@ -429,11 +481,11 @@ extension UI.ProgressBar where T == UIProgressTheme {
                 
                 UI.ProgressBar(
                     style: .stepped(
-                        currentStep: 1,
-                        totalSteps: 3,
-                        labels: ["Profile", "Verification", "Complete"]
-                    ),
-                    theme: UIProgressTheme(fillColor: .purple)
+                        currentStep: 2,
+                        totalSteps: 4,
+                        labels: ["Small", "Tiny", "Dots", "End"],
+                        config: UISteppedProgressConfig(iconSize: 16, lineWidth: 1, spacing: 4)
+                    )
                 )
             }
             .padding()
@@ -442,7 +494,7 @@ extension UI.ProgressBar where T == UIProgressTheme {
             
             // Order Tracking Section
             VStack(alignment: .leading, spacing: 20) {
-                Text("Order Tracking (Mixed Icon Types)")
+                Text("Order Tracking (Configured)")
                     .font(.headline)
                 
                 UI.ProgressBar(
@@ -450,21 +502,22 @@ extension UI.ProgressBar where T == UIProgressTheme {
                         currentStep: 2,
                         totalSteps: 4,
                         labels: ["Ordered", "Packaged", "Shipped", "Delivered"],
-                        icons: [
-                            "cart.fill",                // String literal -> .system
-                            .default,                   // Use default styling (check/dot)
-                            .system("shippingbox.fill"), // Explicit .system
-                            "house.fill"
-                        ],
-                        timestamps: ["10:30 AM", "2:15 PM", "On Way", "Est. Tomorrow"]
+                        config: UIOrderTrackingConfig(
+                            iconSize: 60,
+                            lineWidth: 4,
+                            spacing: 24,
+                            icons: ["cart.fill", .default, .system("shippingbox.fill"), "house.fill"],
+                            subLabels: ["10:30 AM", "2:15 PM", "On Way", "Est. Tomorrow"],
+                            subLabelsFont: .body
+                        )
                     ),
-                    theme: UIProgressTheme(fillColor: .blue)
+                    theme: UIProgressTheme(fillColor: .orange)
                 )
             }
             .padding()
-            
+
             Divider()
-            
+
             // Gradient Section
             VStack(alignment: .leading, spacing: 20) {
                 Text("Gradient Style")
@@ -472,7 +525,9 @@ extension UI.ProgressBar where T == UIProgressTheme {
                 
                 UI.ProgressBar(
                     style: .gradient(value: 0.75),
-                    theme: UIProgressTheme(fillColor: .cyan, height: 10, showPercentage: true)
+                    theme: UIProgressTheme(fillColor: .cyan, showPercentage: true),
+                    width: 250,
+                    height: 50
                 )
             }
             .padding()

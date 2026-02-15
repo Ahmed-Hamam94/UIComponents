@@ -25,17 +25,20 @@ extension UI {
         private let theme: T
         /// Optional accessibility overrides. Nil = use defaults.
         private let accessibility: UIAccessibility?
+        private let size: CGFloat?
 
         public init(
             isSelected: Binding<Bool>,
             label: String? = nil,
             theme: T,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            size: CGFloat? = nil
         ) {
             self._isSelected = isSelected
             self.label = label
             self.theme = theme
             self.accessibility = accessibility
+            self.size = size
         }
 
         public var body: some View {
@@ -43,7 +46,7 @@ extension UI {
                 isSelected.toggle()
             }) {
                 HStack(spacing: 12) {
-                    RadioIcon(isSelected: isSelected, theme: theme)
+                    RadioIcon(isSelected: isSelected, theme: theme, size: size ?? theme.size)
 
                     if let label {
                         Text(label)
@@ -70,12 +73,14 @@ extension UI.RadioButton where T == UIRadioButtonTheme {
         isSelected: Binding<Bool>,
         label: String? = nil,
         theme: UIRadioButtonTheme = .primary,
-        accessibility: UIAccessibility? = nil
+        accessibility: UIAccessibility? = nil,
+        size: CGFloat? = 24
     ) {
         self._isSelected = isSelected
         self.label = label
         self.theme = theme
         self.accessibility = accessibility
+        self.size = size
     }
 }
 
@@ -83,6 +88,7 @@ extension UI.RadioButton where T == UIRadioButtonTheme {
 private struct RadioIcon<T: UIRadioButtonThemeProtocol>: View {
     let isSelected: Bool
     let theme: T
+    let size: CGFloat
     
     var body: some View {
         ZStack {
@@ -91,13 +97,13 @@ private struct RadioIcon<T: UIRadioButtonThemeProtocol>: View {
                     isSelected ? theme.selectedColor : theme.unselectedBorderColor,
                     lineWidth: theme.borderWidth
                 )
-                .frame(width: theme.size, height: theme.size)
+                .frame(width: size, height: size)
             
             Circle()
                 .fill(isSelected ? theme.selectedColor : Color.clear)
                 .frame(
-                    width: theme.size * theme.innerCircleScale,
-                    height: theme.size * theme.innerCircleScale
+                    width: size * theme.innerCircleScale,
+                    height: size * theme.innerCircleScale
                 )
                 .scaleEffect(isSelected ? 1.0 : 0.001)
         }
@@ -107,7 +113,7 @@ private struct RadioIcon<T: UIRadioButtonThemeProtocol>: View {
 
 #Preview("Radio Button Themes") {
     VStack(alignment: .leading, spacing: 20) {
-        UI.RadioButton(isSelected: .constant(true))
+        UI.RadioButton(isSelected: .constant(true), size: 20)
         UI.RadioButton(isSelected: .constant(false), label: "Unselected State")
         UI.RadioButton(isSelected: .constant(true), label: "Selected State")
         UI.RadioButton(isSelected: .constant(true), label: "Primary", theme: .primary)

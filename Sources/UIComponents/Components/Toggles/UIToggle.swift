@@ -24,17 +24,20 @@ extension UI {
         private let theme: T
         /// Optional accessibility overrides. Nil = use defaults.
         private let accessibility: UIAccessibility?
+        private let size: CGFloat?
 
         public init(
             isOn: Binding<Bool>,
             label: String? = nil,
             theme: T,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            size: CGFloat? = nil
         ) {
             self._isOn = isOn
             self.label = label
             self.theme = theme
             self.accessibility = accessibility
+            self.size = size
         }
 
         public var body: some View {
@@ -47,7 +50,7 @@ extension UI {
 
                 Spacer()
 
-                ToggleCapsule(isOn: $isOn, theme: theme)
+                ToggleCapsule(isOn: $isOn, theme: theme, size: size ?? theme.trackHeight)
             }
             .padding(.vertical, 4)
             .accessibilityElement(children: .combine)
@@ -67,12 +70,14 @@ extension UI.Toggle where T == UIToggleTheme {
         isOn: Binding<Bool>,
         label: String? = nil,
         theme: UIToggleTheme = .default,
-        accessibility: UIAccessibility? = nil
+        accessibility: UIAccessibility? = nil,
+        size: CGFloat? = nil
     ) {
         self._isOn = isOn
         self.label = label
         self.theme = theme
         self.accessibility = accessibility
+        self.size = size
     }
 }
 
@@ -80,6 +85,11 @@ extension UI.Toggle where T == UIToggleTheme {
 private struct ToggleCapsule<T: UIToggleThemeProtocol>: View {
     @Binding var isOn: Bool
     let theme: T
+    let size: CGFloat
+    
+    private var trackWidth: CGFloat {
+        (size / theme.trackHeight) * theme.trackWidth
+    }
     
     var body: some View {
         SwiftUI.Button(action: {
@@ -89,12 +99,13 @@ private struct ToggleCapsule<T: UIToggleThemeProtocol>: View {
         }) {
             Capsule()
                 .fill(isOn ? theme.onColor : theme.offColor)
-                .frame(width: theme.trackWidth, height: theme.trackHeight)
+                .frame(width: trackWidth, height: size)
                 .overlay(
                     Circle()
                         .fill(theme.thumbColor)
                         .padding(2)
-                        .offset(x: isOn ? (theme.trackWidth - theme.trackHeight) / 2 - 2 : -(theme.trackWidth - theme.trackHeight) / 2 + 2)
+                        .offset(x: isOn ? (trackWidth - size) / 2 - 2 : -(trackWidth - size) / 2 + 2)
+                        .frame(width: size, height: size)
                 )
         }
         .buttonStyle(.plain)
@@ -109,7 +120,7 @@ private struct ToggleCapsule<T: UIToggleThemeProtocol>: View {
         UI.Toggle(
             isOn: .constant(true),
             label: "Green",
-            theme: UIToggleTheme(onColor: .green, offColor: .cyan, thumbColor: .blue, font: .body, textColor: .brown, trackWidth: 55, trackHeight: 30)
+            theme: UIToggleTheme(onColor: .green, offColor: .cyan, thumbColor: .blue, font: .body, textColor: .brown, trackWidth: 80, trackHeight: 30)
         )
     }
     .padding()

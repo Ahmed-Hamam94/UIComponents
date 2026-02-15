@@ -35,6 +35,8 @@ extension UI {
         private let disabled: Bool
         /// The visual style of the text field.
         private let theme: UITextFieldThemeProtocol
+        private let width: CGFloat?
+        private let height: CGFloat?
             
         public init(
             phoneNumber: Binding<String>,
@@ -43,7 +45,9 @@ extension UI {
             placeholder: String = "xxxxxxxx",
             showCode: Bool = true,
             disabled: Bool = false,
-            theme: UITextFieldThemeProtocol = UITextFieldTheme()
+            theme: UITextFieldThemeProtocol = UITextFieldTheme(),
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self._phoneNumber = phoneNumber
             self._selectedCountry = selectedCountry
@@ -52,6 +56,8 @@ extension UI {
             self.showCode = showCode
             self.disabled = disabled
             self.theme = theme
+            self.width = width
+            self.height = height
         }
         
         private var hasMultipleCountries: Bool {
@@ -72,7 +78,7 @@ extension UI {
                 // Phone Number Input
                 phoneInput
             }
-            .frame(height: theme.height)
+            .frame(width: width, height: height ?? theme.height)
             .background(theme.backgroundColor)
             .clipShape(.rect(cornerRadius: theme.cornerRadius))
             .overlay(
@@ -156,7 +162,9 @@ extension UI {
         // Default with multiple countries
         UI.PhoneNumberTextField(
             phoneNumber: .constant(""),
-            selectedCountry: .constant(.saudiArabia)
+            selectedCountry: .constant(.saudiArabia),
+            width: 330,
+            height: 60
         )
         
         // Single country (dropdown disabled)

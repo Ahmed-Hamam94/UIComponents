@@ -6,9 +6,6 @@
 //
 
 import SwiftUI
-#if canImport(UIKit)
-import UIKit
-#endif
 
 /// Determines the visual style of the segmented control.
 public enum UISegmentedControlStyle: Sendable {
@@ -51,6 +48,8 @@ extension UI {
         private let style: UISegmentedControlStyle
         /// Optional accessibility overrides for the control. Nil = use default (label: "Segmented control").
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         @Namespace private var namespace
 
@@ -60,7 +59,9 @@ extension UI {
             labelSelector: @escaping (T) -> String,
             theme: S,
             style: UISegmentedControlStyle = .rounded,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
         ) {
             self._selection = selection
             self.options = options
@@ -68,11 +69,17 @@ extension UI {
             self.theme = theme
             self.style = style
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
+        }
+        
+        private var effectiveHeight: CGFloat {
+            height ?? theme.height
         }
         
         private var cornerRadius: CGFloat {
             switch style {
-            case .circular, .pill: return theme.height / 2
+            case .circular, .pill: return effectiveHeight / 2
             default: return theme.cornerRadius
             }
         }
@@ -93,7 +100,7 @@ extension UI {
                 // Background
                 RoundedRectangle(cornerRadius: cornerRadius)
                     .fill(containerBackgroundColor)
-                    .frame(height: theme.height)
+                    .frame(height: effectiveHeight)
                     .overlay(
                         RoundedRectangle(cornerRadius: cornerRadius)
                             .stroke(theme.borderColor, lineWidth: style == .bordered ? 1 : 0)
@@ -105,16 +112,15 @@ extension UI {
                     let segmentWidth = (totalWidth - (CGFloat(options.count - 1) * hStackSpacing)) / CGFloat(options.count)
                     let selectedIndex = options.firstIndex(where: { $0.id == selection.id }) ?? 0
                     
-                    // Capsule/Rounded/Pill style
                     RoundedRectangle(cornerRadius: max(0, cornerRadius - theme.selectedCapsulePadding))
                         .fill(theme.selectedColor)
                         .padding(theme.selectedCapsulePadding)
-                        .frame(width: segmentWidth, height: theme.height)
+                        .frame(width: segmentWidth, height: effectiveHeight)
                         .offset(x: (segmentWidth + hStackSpacing) * CGFloat(selectedIndex))
                         .shadow(color: style == .pill ? Color.black.opacity(0.1) : .clear, radius: 4, x: 0, y: 2)
                         .animation(.spring(response: 0.35, dampingFraction: 0.75), value: selection)
                 }
-                .frame(height: theme.height)
+                .frame(height: effectiveHeight)
                 
                 // Segment Labels
                 HStack(spacing: hStackSpacing) {
@@ -124,12 +130,14 @@ extension UI {
                             isSelected: selection.id == option.id,
                             theme: theme,
                             style: style,
+                            height: effectiveHeight,
                             namespace: namespace,
                             action: { selection = option }
                         )
                     }
                 }
             }
+            .frame(width: width, height: height)
             .accessibilityElement(children: .contain)
             .uiAccessibility(accessibility, defaultLabel: "Segmented control")
         }
@@ -149,7 +157,9 @@ extension UI.SegmentedControl where S == UISegmentedTheme {
         labelSelector: @escaping (T) -> String,
         theme: UISegmentedTheme = .default,
         style: UISegmentedControlStyle = .rounded,
-        accessibility: UIAccessibility? = nil
+        accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
     ) {
         self._selection = selection
         self.options = options
@@ -157,6 +167,8 @@ extension UI.SegmentedControl where S == UISegmentedTheme {
         self.theme = theme
         self.style = style
         self.accessibility = accessibility
+        self.width = width
+        self.height = height
     }
 }
 
@@ -166,6 +178,7 @@ private struct SegmentButton<S: UISegmentedThemeProtocol>: View {
     let isSelected: Bool
     let theme: S
     let style: UISegmentedControlStyle // Added style
+    let height: CGFloat
     let namespace: Namespace.ID
     let action: () -> Void
     
@@ -176,7 +189,7 @@ private struct SegmentButton<S: UISegmentedThemeProtocol>: View {
                 .fontWeight(isSelected ? .semibold : .medium)
                 .foregroundStyle(isSelected ? theme.selectedTextColor : theme.textColor)
                 .scaleEffect(isSelected ? 1.05 : 1.0)
-                .frame(maxWidth: .infinity, maxHeight: theme.height)
+                .frame(maxWidth: .infinity, maxHeight: height)
                 .background(
                     isSelected ? Color.clear : Color.primary.opacity(0.001) // Ensure hit test
                 )
@@ -278,7 +291,9 @@ private struct PreviewWrapper: View {
                             selectedTextColor: .blue,
                             selectedCapsulePadding: 2
                         ),
-                        style: .pill
+                        style: .pill,
+                        width: 290,
+                        height: 70
                     )
                     .padding(4)
                     .background(Color.gray.opacity(0.1))
@@ -297,7 +312,7 @@ private struct PreviewWrapper: View {
                             selectedColor: .blue,
                             textColor: .blue,
                             selectedTextColor: .white,
-                            height: 50
+                            height: 60
                         ),
                         style: .circular
                     )

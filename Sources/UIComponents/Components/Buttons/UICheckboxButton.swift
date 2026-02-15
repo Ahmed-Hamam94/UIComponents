@@ -25,17 +25,20 @@ extension UI {
         private let theme: T
         /// Optional accessibility overrides. Nil = use defaults.
         private let accessibility: UIAccessibility?
+        private let size: CGFloat?
 
         public init(
             isOn: Binding<Bool>,
             label: String? = nil,
             theme: T,
-            accessibility: UIAccessibility? = nil
+            accessibility: UIAccessibility? = nil,
+            size: CGFloat? = nil
         ) {
             self._isOn = isOn
             self.label = label
             self.theme = theme
             self.accessibility = accessibility
+            self.size = size
         }
 
         public var body: some View {
@@ -43,7 +46,7 @@ extension UI {
                 isOn.toggle()
             }) {
                 HStack(spacing: 12) {
-                    CheckboxIcon(isOn: isOn, theme: theme)
+                    CheckboxIcon(isOn: isOn, theme: theme, size: size ?? theme.size)
 
                     if let label {
                         Text(label)
@@ -70,12 +73,14 @@ extension UI.Checkbox where T == UICheckboxTheme {
         isOn: Binding<Bool>,
         label: String? = nil,
         theme: UICheckboxTheme = .primary,
-        accessibility: UIAccessibility? = nil
+        accessibility: UIAccessibility? = nil,
+        size: CGFloat? = nil
     ) {
         self._isOn = isOn
         self.label = label
         self.theme = theme
         self.accessibility = accessibility
+        self.size = size
     }
 }
 
@@ -83,6 +88,7 @@ extension UI.Checkbox where T == UICheckboxTheme {
 private struct CheckboxIcon<T: UICheckboxThemeProtocol>: View {
     let isOn: Bool
     let theme: T
+    let size: CGFloat
     
     var body: some View {
         ZStack {
@@ -91,15 +97,15 @@ private struct CheckboxIcon<T: UICheckboxThemeProtocol>: View {
                     isOn ? theme.checkedColor : theme.uncheckedBorderColor,
                     lineWidth: theme.borderWidth
                 )
-                .frame(width: theme.size, height: theme.size)
+                .frame(width: size, height: size)
             
             if isOn {
                 RoundedRectangle(cornerRadius: theme.cornerRadius)
                     .fill(theme.checkedColor)
-                    .frame(width: theme.size, height: theme.size)
+                    .frame(width: size, height: size)
                 
                 Image(systemName: theme.checkmarkIcon)
-                    .font(.system(size: theme.size * 0.5, weight: .bold))
+                    .font(.system(size: size * 0.5, weight: .bold))
                     .foregroundStyle(theme.checkmarkColor)
             }
         }
@@ -114,7 +120,7 @@ private struct CheckboxIcon<T: UICheckboxThemeProtocol>: View {
         UI.Checkbox(isOn: .constant(true), label: "Checked State")
         UI.Checkbox(isOn: .constant(true), label: "Primary", theme: .primary)
         UI.Checkbox(isOn: .constant(true), label: "Secondary", theme: .secondary)
-        UI.Checkbox(isOn: .constant(true), label: "Success", theme: .success)
+        UI.Checkbox(isOn: .constant(true), label: "Success", theme: .success, size: 20)
     }
     .padding()
 }

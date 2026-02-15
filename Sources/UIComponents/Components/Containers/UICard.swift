@@ -27,16 +27,22 @@ extension UI {
         private let accessibilityLabel: String?
         /// Optional accessibility overrides. Nil = use default (label from accessibilityLabel if set).
         private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
 
         public init(
             theme: T,
             accessibilityLabel: String? = nil,
             accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil,
             @ViewBuilder content: @escaping () -> Content
         ) {
             self.theme = theme
             self.accessibilityLabel = accessibilityLabel
             self.accessibility = accessibility
+            self.width = width
+            self.height = height
             self.contentBuilder = content
         }
 
@@ -51,6 +57,7 @@ extension UI {
                     x: theme.shadowOffset.x,
                     y: theme.shadowOffset.y
                 )
+                .frame(width: width, height: height)
                 .accessibilityElement(children: (accessibility?.label ?? accessibilityLabel) != nil ? .combine : .contain)
                 .uiAccessibility(accessibility, defaultLabel: accessibilityLabel)
         }
@@ -62,11 +69,15 @@ extension UI.Card where T == UICardTheme {
         theme: UICardTheme = .default,
         accessibilityLabel: String? = nil,
         accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) {
         self.theme = theme
         self.accessibilityLabel = accessibilityLabel
         self.accessibility = accessibility
+        self.width = width
+        self.height = height
         self.contentBuilder = content
     }
 }
