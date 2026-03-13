@@ -14,51 +14,45 @@ public extension View {
     /// This modifier uses SwiftUI's redaction system to automatically create
     /// skeleton placeholders that match your view's layout.
     ///
+    /// - Parameters:
+    ///   - isLoading: Whether to show the skeleton loading state.
+    ///   - theme: The visual theme for the skeleton effect.
+    ///   - loadingLabel: Custom VoiceOver label when loading (default: "Loading content").
+    ///
     /// ```swift
     /// VStack {
     ///     Text("User Name")
     ///     Text("user@example.com")
     /// }
-    /// .skeletonRedacted(isLoading: true)
+    /// .skeletonRedacted(isLoading: true, loadingLabel: "Loading profile")
     /// ```
     func skeletonRedacted(
         isLoading: Bool,
-        theme: UISkeletonTheme = .default
+        theme: UISkeletonTheme = .default,
+        loadingLabel: String = "Loading content"
     ) -> some View {
-        self.modifier(RedactedSkeletonModifier(isLoading: isLoading, theme: theme))
+        self.modifier(RedactedSkeletonModifier(isLoading: isLoading, theme: theme, loadingLabel: loadingLabel))
     }
 }
 
 private struct RedactedSkeletonModifier: ViewModifier {
     let isLoading: Bool
     let theme: UISkeletonTheme
+    let loadingLabel: String
     @State private var phase: CGFloat = 0
     
     func body(content: Content) -> some View {
         content
             .redacted(reason: isLoading ? .placeholder : [])
             .overlay(
-                GeometryReader { geo in
-                    if isLoading {
-                        // Enhanced shimmer gradient with better visibility
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                .clear,
-                                theme.highlightColor.opacity(0.3),
-                                theme.highlightColor.opacity(0.8),
-                                theme.highlightColor.opacity(0.3),
-                                .clear
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                        .frame(width: geo.size.width * 0.7) // Wider shimmer
-                        .offset(x: -geo.size.width * 0.7 + (geo.size.width * 1.7 * phase))
-                        .blendMode(.screen) // Better blend mode for visibility
-                        .allowsHitTesting(false)
-                    }
-                }
+                // Using drawingGroup() for better animation performance
+                // This flattens the shimmer to a Metal layer, reducing layout overhead
+                shimmerOverlay
+                    .drawingGroup()
             )
+            .accessibilityElement(children: isLoading ? .ignore : .contain)
+            .accessibilityLabel(isLoading ? loadingLabel : "")
+            .accessibilityAddTraits(isLoading ? .updatesFrequently : [])
             .onAppear {
                 if isLoading {
                     withAnimation(.linear(duration: theme.animationDuration * 0.8).repeatForever(autoreverses: false)) {
@@ -74,6 +68,30 @@ private struct RedactedSkeletonModifier: ViewModifier {
                     }
                 }
             }
+    }
+    
+    @ViewBuilder
+    private var shimmerOverlay: some View {
+        if isLoading {
+            GeometryReader { geo in
+                // Enhanced shimmer gradient with better visibility
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        .clear,
+                        theme.highlightColor.opacity(0.3),
+                        theme.highlightColor.opacity(0.8),
+                        theme.highlightColor.opacity(0.3),
+                        .clear
+                    ]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+                .frame(width: geo.size.width * 0.7) // Wider shimmer
+                .offset(x: -geo.size.width * 0.7 + (geo.size.width * 1.7 * phase))
+                .blendMode(.screen) // Better blend mode for visibility
+                .allowsHitTesting(false)
+            }
+        }
     }
 }
 
@@ -136,7 +154,7 @@ private struct RedactedSkeletonModifier: ViewModifier {
                 }
             }
         }
-        .skeletonRedacted(isLoading: true, theme: UISkeletonTheme(baseColor: .cyan, highlightColor: .blue, animationDuration: 1.9))
+        .skeletonRedacted(isLoading: true, theme: UISkeletonTheme(baseColor: .cyan, highlightColor: .gray.opacity(0.1), animationDuration: 1.9))
     }
     .padding()
 }

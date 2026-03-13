@@ -117,3 +117,91 @@ public extension ValidationRule {
         }
     }
 }
+
+// MARK: - Async Validation Rule
+
+/// A validation rule that performs asynchronous validation.
+///
+/// Use async validation for checks that require network requests or heavy computation,
+/// such as checking username availability or validating against a remote API.
+///
+/// ```swift
+/// let rule = AsyncValidationRule.usernameAvailable { username in
+///     try await api.checkUsernameAvailable(username)
+/// }
+/// ```
+public struct AsyncValidationRule: Sendable {
+    /// A closure that validates a string asynchronously and returns an optional error message.
+    public let validate: @Sendable (String) async throws -> String?
+    
+    /// Creates a new async validation rule with a custom async validation closure.
+    /// - Parameter validate: A thread-safe async closure that returns an error message if invalid.
+    public init(validate: @escaping @Sendable (String) async throws -> String?) {
+        self.validate = validate
+    }
+}
+
+// MARK: - Common Async Validation Rules
+public extension AsyncValidationRule {
+    
+    /// Validates username availability via an async check.
+    /// - Parameters:
+    ///   - debounceMilliseconds: How long to wait before running the check (default: 300ms).
+    ///   - check: An async closure that returns true if the username is available.
+    ///   - message: The error message if the username is taken.
+    static func usernameAvailable(
+        check: @escaping @Sendable (String) async throws -> Bool,
+        message: String = "This username is already taken"
+    ) -> AsyncValidationRule {
+        AsyncValidationRule { @Sendable value in
+            guard !value.isEmpty else { return nil }
+            let isAvailable = try await check(value)
+            return isAvailable ? nil : message
+        }
+    }
+    
+    /// Validates email availability via an async check.
+    /// - Parameters:
+    ///   - check: An async closure that returns true if the email is available.
+    ///   - message: The error message if the email is taken.
+    static func emailAvailable(
+        check: @escaping @Sendable (String) async throws -> Bool,
+        message: String = "This email is already registered"
+    ) -> AsyncValidationRule {
+        AsyncValidationRule { @Sendable value in
+            guard !value.isEmpty else { return nil }
+            let isAvailable = try await check(value)
+            return isAvailable ? nil : message
+        }
+    }
+    
+    /// A generic async validation rule with a custom check.
+    /// - Parameters:
+    ///   - validation: An async closure that returns true if valid.
+    ///   - message: The error message if validation fails.
+    static func asyncCustom(
+        _ validation: @escaping @Sendable (String) async throws -> Bool,
+        message: String
+    ) -> AsyncValidationRule {
+        AsyncValidationRule { @Sendable value in
+            let isValid = try await validation(value)
+            return isValid ? nil : message
+        }
+    }
+    
+    /// Validates against a remote API endpoint.
+    /// - Parameters:
+    ///   - endpoint: The API endpoint to call.
+    ///   - transform: Transforms the input into the request payload.
+    ///   - validateResponse: Validates the API response and returns an error message if invalid.
+    static func apiValidation<T: Decodable & Sendable>(
+        fetch: @escaping @Sendable (String) async throws -> T,
+        validate: @escaping @Sendable (T) -> String?
+    ) -> AsyncValidationRule {
+        AsyncValidationRule { @Sendable value in
+            guard !value.isEmpty else { return nil }
+            let response = try await fetch(value)
+            return validate(response)
+        }
+    }
+}

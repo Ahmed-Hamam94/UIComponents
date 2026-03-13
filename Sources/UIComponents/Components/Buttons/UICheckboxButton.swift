@@ -90,6 +90,8 @@ private struct CheckboxIcon<T: UICheckboxThemeProtocol>: View {
     let theme: T
     let size: CGFloat
     
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: theme.cornerRadius)
@@ -109,7 +111,7 @@ private struct CheckboxIcon<T: UICheckboxThemeProtocol>: View {
                     .foregroundStyle(theme.checkmarkColor)
             }
         }
-        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isOn)
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.6), value: isOn)
     }
 }
 

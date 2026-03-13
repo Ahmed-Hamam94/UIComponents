@@ -35,6 +35,8 @@ extension UI {
         private let disabled: Bool
         /// The visual style of the text field.
         private let theme: UITextFieldThemeProtocol
+        /// Optional accessibility overrides. Nil = use defaults.
+        private let accessibility: UIAccessibility?
         private let width: CGFloat?
         private let height: CGFloat?
             
@@ -46,6 +48,7 @@ extension UI {
             showCode: Bool = true,
             disabled: Bool = false,
             theme: UITextFieldThemeProtocol = UITextFieldTheme(),
+            accessibility: UIAccessibility? = nil,
             width: CGFloat? = nil,
             height: CGFloat? = nil
         ) {
@@ -56,12 +59,52 @@ extension UI {
             self.showCode = showCode
             self.disabled = disabled
             self.theme = theme
+            self.accessibility = accessibility
             self.width = width
             self.height = height
         }
         
+        // MARK: - Configuration-Based Initializer
+        
+        /// Creates a phone number text field using a configuration object.
+        ///
+        /// ```swift
+        /// let config = PhoneNumberTextFieldConfig.usOnly
+        /// UI.PhoneNumberTextField(
+        ///     phoneNumber: $phone,
+        ///     selectedCountry: $country,
+        ///     config: config
+        /// )
+        /// ```
+        public init(
+            phoneNumber: Binding<String>,
+            selectedCountry: Binding<Country>,
+            config: PhoneNumberTextFieldConfig,
+            theme: UITextFieldThemeProtocol = UITextFieldTheme(),
+            accessibility: UIAccessibility? = nil
+        ) {
+            self._phoneNumber = phoneNumber
+            self._selectedCountry = selectedCountry
+            self.countries = config.countries
+            self.placeholder = config.placeholder
+            self.showCode = config.showCode
+            self.disabled = config.disabled
+            self.theme = theme
+            self.accessibility = accessibility
+            self.width = config.width
+            self.height = config.height
+        }
+        
         private var hasMultipleCountries: Bool {
             countries.count > 1
+        }
+        
+        /// Computed accessibility value showing current phone number with country code.
+        private var accessibilityValue: String {
+            if phoneNumber.isEmpty {
+                return "Empty"
+            }
+            return "\(selectedCountry.dialCode) \(phoneNumber)"
         }
         
         public var body: some View {
@@ -87,6 +130,13 @@ extension UI {
             )
             .opacity(disabled ? 0.6 : 1.0)
             .disabled(disabled)
+            .accessibilityElement(children: .combine)
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: "Phone number",
+                defaultValue: accessibilityValue,
+                defaultHint: hasMultipleCountries ? "Select country and enter phone number" : "Enter phone number"
+            )
         }
         
         // MARK: - Country Selector
@@ -105,10 +155,13 @@ extension UI {
                                         .foregroundStyle(.secondary)
                                 }
                             }
+                            .accessibilityLabel("\(country.name), \(country.dialCode)")
                         }
                     } label: {
                         countrySelectorContent
                     }
+                    .accessibilityLabel("Country selector")
+                    .accessibilityHint("Double tap to select a different country")
                 } else {
                     countrySelectorContent
                 }

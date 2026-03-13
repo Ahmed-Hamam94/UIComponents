@@ -1,13 +1,13 @@
 // swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
-// Requires Swift 6.0+ for iOS 18. Use Xcode or Terminal to build if the IDE run fails (sandbox).
+// Requires Swift 6.0+ for iOS 17+. Use Xcode or Terminal to build if the IDE run fails (sandbox).
 
 import PackageDescription
 
 let package = Package(
     name: "UIComponents",
     platforms: [
-        .iOS(.v18)
+        .iOS(.v17)
     ],
     products: [
         .library(
@@ -21,7 +21,9 @@ let package = Package(
         ),
         .testTarget(
             name: "UIComponentsTests",
-            dependencies: ["UIComponents"]
+            dependencies: [
+                "UIComponents"
+            ]
         ),
     ]
 )

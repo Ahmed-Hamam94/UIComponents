@@ -40,6 +40,8 @@ extension UI {
         
         @State private var internalError: String? = nil
         @State private var hasBeenEdited: Bool = false
+        @State private var isValidating: Bool = false
+        @State private var validationTask: Task<Void, Never>? = nil
         
         /// The title label text displayed above the field.
         private let title: String
@@ -47,6 +49,10 @@ extension UI {
         private let placeholder: String
         /// A list of rules to validate against the input text.
         private let validationRules: [ValidationRule]
+        /// A list of async rules to validate against the input text.
+        private let asyncValidationRules: [AsyncValidationRule]
+        /// Debounce duration in milliseconds for async validation.
+        private let asyncDebounceMilliseconds: UInt64
         /// When validation should be triggered.
         private let validationTrigger: ValidationTrigger
         /// Optional SF Symbol name for the input icon.
@@ -58,11 +64,18 @@ extension UI {
         /// The visual style of the text field.
         private let theme: UITextFieldThemeProtocol
         
-        // Styling Overrides
-        private let titleFont: Font
-        private let titleColor: Color
-        private let errorFont: Font
-        private let errorColor: Color
+        // Styling Overrides (nil = use theme values)
+        private let titleFontOverride: Font?
+        private let titleColorOverride: Color?
+        private let errorFontOverride: Font?
+        private let errorColorOverride: Color?
+        
+        // Computed properties to resolve overrides
+        private var titleFont: Font { titleFontOverride ?? theme.titleFont }
+        private var titleColor: Color { titleColorOverride ?? theme.titleColor }
+        private var errorFont: Font { errorFontOverride ?? theme.errorMessageFont }
+        private var errorColor: Color { errorColorOverride ?? theme.errorMessageColor }
+        
         /// Optional accessibility overrides for the field. Nil = use defaults.
         private let accessibility: UIAccessibility?
         /// Optional accessibility overrides for the password visibility button (when isSecure). Nil = use defaults.
@@ -79,15 +92,17 @@ extension UI {
             title: String,
             placeholder: String = "",
             validationRules: [ValidationRule] = [],
+            asyncValidationRules: [AsyncValidationRule] = [],
+            asyncDebounceMilliseconds: UInt64 = 300,
             validationTrigger: ValidationTrigger = .onChange,
             image: String? = nil,
             imagePosition: ImagePosition = .leading,
             isSecure: Bool = false,
             theme: UITextFieldThemeProtocol = UITextFieldTheme(),
-            titleFont: Font = .subheadline,
-            titleColor: Color = .primary,
-            errorFont: Font = .caption,
-            errorColor: Color = .red,
+            titleFont: Font? = nil,
+            titleColor: Color? = nil,
+            errorFont: Font? = nil,
+            errorColor: Color? = nil,
             accessibility: UIAccessibility? = nil,
             passwordVisibilityAccessibility: UIAccessibility? = nil,
             width: CGFloat? = nil,
@@ -99,19 +114,63 @@ extension UI {
             self.title = title
             self.placeholder = placeholder
             self.validationRules = validationRules
+            self.asyncValidationRules = asyncValidationRules
+            self.asyncDebounceMilliseconds = asyncDebounceMilliseconds
             self.validationTrigger = validationTrigger
             self.image = image
             self.imagePosition = imagePosition
             self.isSecure = isSecure
             self.theme = theme
-            self.titleFont = titleFont
-            self.titleColor = titleColor
-            self.errorFont = errorFont
-            self.errorColor = errorColor
+            self.titleFontOverride = titleFont
+            self.titleColorOverride = titleColor
+            self.errorFontOverride = errorFont
+            self.errorColorOverride = errorColor
             self.accessibility = accessibility
             self.passwordVisibilityAccessibility = passwordVisibilityAccessibility
             self.width = width
             self.height = height
+        }
+        
+        // MARK: - Configuration-Based Initializer
+        
+        /// Creates a validated text field using a configuration object.
+        ///
+        /// This initializer provides a cleaner API for components with many options.
+        ///
+        /// ```swift
+        /// let config = ValidatedTextFieldConfig.email()
+        /// UI.ValidatedTextField(text: $email, config: config)
+        /// ```
+        public init(
+            text: Binding<String>,
+            isValid: Binding<Bool> = .constant(true),
+            triggerValidation: Binding<Int> = .constant(0),
+            config: ValidatedTextFieldConfig,
+            theme: UITextFieldThemeProtocol = UITextFieldTheme(),
+            accessibility: UIAccessibility? = nil,
+            passwordVisibilityAccessibility: UIAccessibility? = nil
+        ) {
+            self._text = text
+            self._isValid = isValid
+            self._triggerValidation = triggerValidation
+            self.title = config.title
+            self.placeholder = config.placeholder
+            self.validationRules = config.validationRules
+            self.asyncValidationRules = config.asyncValidationRules
+            self.asyncDebounceMilliseconds = config.asyncDebounceMilliseconds
+            self.validationTrigger = config.validationTrigger
+            self.image = config.image
+            self.imagePosition = config.imagePosition
+            self.isSecure = config.isSecure
+            self.theme = theme
+            self.titleFontOverride = config.titleFont
+            self.titleColorOverride = config.titleColor
+            self.errorFontOverride = config.errorFont
+            self.errorColorOverride = config.errorColor
+            self.accessibility = accessibility
+            self.passwordVisibilityAccessibility = passwordVisibilityAccessibility
+            self.width = config.width
+            self.height = config.height
         }
         
         private var hasError: Bool {
@@ -182,6 +241,9 @@ extension UI {
                         }
                     }
                     
+                    // Async validation loading indicator
+                    validationLoadingIndicator
+                    
                     if isSecure {
                         passwordVisibilityButton
                     } else if let image = image, imagePosition == .trailing {
@@ -245,6 +307,7 @@ extension UI {
         }
         
         private func runValidation(_ value: String) {
+            // Run synchronous validation first
             for rule in validationRules {
                 if let errorMessage = rule.validate(value) {
                     internalError = errorMessage
@@ -252,8 +315,66 @@ extension UI {
                     return
                 }
             }
-            internalError = nil
-            isValid = true
+            
+            // If no async rules, we're done
+            guard !asyncValidationRules.isEmpty else {
+                internalError = nil
+                isValid = true
+                return
+            }
+            
+            // Cancel any existing async validation task
+            validationTask?.cancel()
+            
+            // Start async validation with debounce
+            validationTask = Task { @MainActor in
+                // Debounce
+                try? await Task.sleep(nanoseconds: asyncDebounceMilliseconds * 1_000_000)
+                
+                guard !Task.isCancelled else { return }
+                
+                isValidating = true
+                
+                do {
+                    for rule in asyncValidationRules {
+                        guard !Task.isCancelled else { return }
+                        
+                        if let errorMessage = try await rule.validate(value) {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                internalError = errorMessage
+                                isValid = false
+                            }
+                            isValidating = false
+                            return
+                        }
+                    }
+                    
+                    guard !Task.isCancelled else { return }
+                    
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        internalError = nil
+                        isValid = true
+                    }
+                } catch {
+                    // Handle validation errors (e.g., network failure)
+                    guard !Task.isCancelled else { return }
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        internalError = "Validation failed. Please try again."
+                        isValid = false
+                    }
+                }
+                
+                isValidating = false
+            }
+        }
+        
+        /// A loading indicator shown during async validation.
+        @ViewBuilder
+        private var validationLoadingIndicator: some View {
+            if isValidating {
+                ProgressView()
+                    .controlSize(.small)
+            }
         }
     }
 }

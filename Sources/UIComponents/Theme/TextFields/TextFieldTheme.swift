@@ -16,6 +16,14 @@ public protocol UITextFieldThemeProtocol: Sendable {
     var font: Font { get }
     var placeholderFont: Font { get }
     
+    // Title Typography (for ValidatedTextField)
+    var titleFont: Font { get }
+    var titleColor: Color { get }
+    
+    // Error Message Typography (for ValidatedTextField)
+    var errorMessageFont: Font { get }
+    var errorMessageColor: Color { get }
+    
     // Colors - Default State
     var placeholderColor: Color { get }
     var textColor: Color { get }
@@ -51,6 +59,14 @@ public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
     public var font: Font
     public var placeholderFont: Font
     
+    // Title Typography (for ValidatedTextField)
+    public var titleFont: Font
+    public var titleColor: Color
+    
+    // Error Message Typography (for ValidatedTextField)
+    public var errorMessageFont: Font
+    public var errorMessageColor: Color
+    
     // Colors - Default State
     public var placeholderColor: Color
     public var textColor: Color
@@ -81,6 +97,10 @@ public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
     public init(
         font: Font = .body,
         placeholderFont: Font = .body,
+        titleFont: Font = .subheadline,
+        titleColor: Color = .primary,
+        errorMessageFont: Font = .caption,
+        errorMessageColor: Color = .red,
         placeholderColor: Color = .gray,
         textColor: Color = .primary,
         backgroundColor: Color = .gray.opacity(0.15),
@@ -101,6 +121,10 @@ public struct UITextFieldTheme: UITextFieldThemeProtocol, Sendable {
     ) {
         self.font = font
         self.placeholderFont = placeholderFont
+        self.titleFont = titleFont
+        self.titleColor = titleColor
+        self.errorMessageFont = errorMessageFont
+        self.errorMessageColor = errorMessageColor
         self.placeholderColor = placeholderColor
         self.textColor = textColor
         self.backgroundColor = backgroundColor

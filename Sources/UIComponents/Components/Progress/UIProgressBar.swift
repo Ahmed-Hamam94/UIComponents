@@ -7,111 +7,91 @@
 
 import SwiftUI
 
-/// Represents an icon used in a progress step.
-public enum UIProgressStepIcon: Sendable, ExpressibleByStringLiteral {
-    /// A system symbol (SF Symbol).
-    case system(String)
-    /// An image from the asset catalog.
-    case asset(String)
-    /// Uses the default behavior (checkmark for completed, dot for pending).
-    case `default`
-    
-    public init(stringLiteral value: String) {
-        self = .system(value)
-    }
-}
-
-/// Configuration for the stepped progress style.
-public struct UISteppedProgressConfig: Sendable {
-    public let iconSize: CGFloat
-    public let lineWidth: CGFloat
-    public let spacing: CGFloat
-    
-    public init(iconSize: CGFloat = 32, lineWidth: CGFloat = 2, spacing: CGFloat = 8) {
-        self.iconSize = iconSize
-        self.lineWidth = lineWidth
-        self.spacing = spacing
-    }
-    
-    public static let `default` = UISteppedProgressConfig()
-}
-
-/// Configuration for the order tracking progress style.
-public struct UIOrderTrackingConfig: Sendable {
-    public let iconSize: CGFloat
-    public let lineWidth: CGFloat
-    public let spacing: CGFloat
-    public let icons: [UIProgressStepIcon]?
-    public let subLabels: [String]?
-    public let subLabelsFont: Font?
-    
-    public init(
-        iconSize: CGFloat = 44,
-        lineWidth: CGFloat = 2,
-        spacing: CGFloat = 16,
-        icons: [UIProgressStepIcon]? = nil,
-        subLabels: [String]? = nil,
-        subLabelsFont: Font? = .caption
-    ) {
-        self.iconSize = iconSize
-        self.lineWidth = lineWidth
-        self.spacing = spacing
-        self.icons = icons
-        self.subLabels = subLabels
-        self.subLabelsFont = subLabelsFont
-    }
-    
-    public static let `default` = UIOrderTrackingConfig()
-}
-
-/// Defines the visual style and data of the progress bar.
-public enum UIProgressBarStyle: Sendable {
-    /// A simple linear progress bar.
-    case linear(value: Double)
-    /// A circular progress indicator.
-    case circular(value: Double)
-    /// A stepped progress bar for multi-stage processes.
-    case stepped(currentStep: Int, totalSteps: Int, labels: [String]? = nil, config: UISteppedProgressConfig = .default)
-    /// A premium order tracking style with icons and sub-labels.
-    case orderTracking(currentStep: Int, totalSteps: Int, labels: [String]? = nil, config: UIOrderTrackingConfig = .default)
-    /// A gradient-filled progress bar.
-    case gradient(value: Double)
-}
-
 extension UI {
     /// A customizable progress indicator for showing task completion.
     ///
-    /// The initialization depends on the chosen style, which carries the necessary data.
-    ///
+    /// **Recommended**: Use the new data/visualStyle initializer for better separation of concerns:
     /// ```swift
-    /// // Linear progress
-    /// UI.ProgressBar(style: .linear(value: 0.75))
+    /// // Linear progress with separated data and style
+    /// UI.ProgressBar(
+    ///     data: UIProgressData(value: 0.75),
+    ///     visualStyle: .linear
+    /// )
     ///
     /// // Stepped progress
     /// UI.ProgressBar(
-    ///     style: .stepped(
-    ///         currentStep: 2, 
-    ///         totalSteps: 4, 
-    ///         labels: ["Order", "Processing", "Shipped", "Delivered"]
-    ///     )
+    ///     data: UIProgressData(currentStep: 2, totalSteps: 4, labels: ["Order", "Processing", "Shipped", "Delivered"]),
+    ///     visualStyle: .stepped()
     /// )
     /// ```
+    ///
+    /// **Legacy**: The combined style initializer is still supported but deprecated:
+    /// ```swift
+    /// UI.ProgressBar(style: .linear(value: 0.75))
+    /// ```
     public struct ProgressBar<T: UIProgressThemeProtocol>: View {
+        // Internal storage uses the legacy style for rendering
         private let style: UIProgressBarStyle
         private let theme: T
+        private let accessibility: UIAccessibility?
         
+        @Environment(\.accessibilityReduceMotion) private var reduceMotion
         @State private var animatedValue: Double = 0
         private let width: CGFloat?
         private let height: CGFloat?
         
+        // MARK: - New Initializer (Recommended)
+        
+        /// Creates a progress bar with separated data and visual style.
+        /// - Parameters:
+        ///   - data: The progress data (value, steps, labels).
+        ///   - visualStyle: The visual presentation style.
+        ///   - theme: The color and typography theme.
+        ///   - accessibility: Optional custom accessibility configuration.
+        ///   - width: Optional fixed width.
+        ///   - height: Optional fixed height.
+        public init(
+            data: UIProgressData,
+            visualStyle: UIProgressVisualStyle,
+            theme: T,
+            accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil
+        ) {
+            // Convert to legacy style for internal rendering
+            switch visualStyle {
+            case .linear:
+                self.style = .linear(value: data.value)
+            case .circular:
+                self.style = .circular(value: data.value)
+            case .gradient:
+                self.style = .gradient(value: data.value)
+            case .stepped(let config):
+                self.style = .stepped(currentStep: data.currentStep, totalSteps: data.totalSteps, labels: data.labels, config: config)
+            case .orderTracking(let config):
+                self.style = .orderTracking(currentStep: data.currentStep, totalSteps: data.totalSteps, labels: data.labels, config: config)
+            }
+            self.theme = theme
+            self.accessibility = accessibility
+            self.width = width
+            self.height = height
+        }
+        
+        // MARK: - Legacy Initializer (Deprecated)
+        
+        /// Creates a progress bar with combined style and data.
+        /// - Note: This initializer is deprecated. Use `init(data:visualStyle:theme:)` instead.
+        @available(*, deprecated, message: "Use init(data:visualStyle:theme:) for better separation of concerns")
         public init(
             style: UIProgressBarStyle,
             theme: T,
+            accessibility: UIAccessibility? = nil,
             width: CGFloat? = nil,
             height: CGFloat? = nil
         ) {
             self.style = style
             self.theme = theme
+            self.accessibility = accessibility
             self.width = width
             self.height = height
         }
@@ -124,6 +104,35 @@ extension UI {
             case .stepped(let currentStep, let totalSteps, _, _), 
                  .orderTracking(let currentStep, let totalSteps, _, _):
                 return totalSteps > 0 ? Double(currentStep) / Double(totalSteps) : 0
+            }
+        }
+        
+        // Computed accessibility defaults based on style
+        private var defaultAccessibilityLabel: String {
+            switch style {
+            case .linear, .circular, .gradient:
+                return "Progress"
+            case .stepped(let currentStep, let totalSteps, let labels, _):
+                if let labels = labels, currentStep < labels.count {
+                    return "Step \(currentStep + 1) of \(totalSteps): \(labels[currentStep])"
+                }
+                return "Step \(currentStep + 1) of \(totalSteps)"
+            case .orderTracking(let currentStep, let totalSteps, let labels, _):
+                if let labels = labels, currentStep > 0, currentStep - 1 < labels.count {
+                    return "Order tracking: \(labels[currentStep - 1]) completed, step \(currentStep) of \(totalSteps)"
+                }
+                return "Order tracking: Step \(currentStep) of \(totalSteps)"
+            }
+        }
+        
+        private var defaultAccessibilityValue: String {
+            switch style {
+            case .linear(let value), .circular(let value), .gradient(let value):
+                return "\(Int(value * 100)) percent"
+            case .stepped(let currentStep, let totalSteps, _, _),
+                 .orderTracking(let currentStep, let totalSteps, _, _):
+                let percent = totalSteps > 0 ? Int(Double(currentStep) / Double(totalSteps) * 100) : 0
+                return "\(percent) percent complete"
             }
         }
         
@@ -143,15 +152,30 @@ extension UI {
                 }
             }
             .onAppear {
-                withAnimation(.easeOut(duration: 0.6)) {
+                if reduceMotion {
                     animatedValue = targetValue
+                } else {
+                    withAnimation(.easeOut(duration: 0.6)) {
+                        animatedValue = targetValue
+                    }
                 }
             }
             .onChange(of: targetValue) { _, newValue in
-                withAnimation(.easeOut(duration: 0.3)) {
+                if reduceMotion {
                     animatedValue = newValue
+                } else {
+                    withAnimation(.easeOut(duration: 0.3)) {
+                        animatedValue = newValue
+                    }
                 }
             }
+            .accessibilityElement(children: .ignore)
+            .uiAccessibility(
+                accessibility,
+                defaultLabel: defaultAccessibilityLabel,
+                defaultValue: defaultAccessibilityValue,
+                defaultHint: nil
+            )
         }
         
         // MARK: - Linear Progress
@@ -178,8 +202,6 @@ extension UI {
                 .frame(height: height ?? theme.height)
             }
             .frame(width: width)
-            .accessibilityLabel("Progress")
-            .accessibilityValue("\(Int(value * 100)) percent")
         }
         
         // MARK: - Circular Progress
@@ -204,8 +226,6 @@ extension UI {
                 }
             }
             .frame(width: size, height: size)
-            .accessibilityLabel("Progress")
-            .accessibilityValue("\(Int(value * 100)) percent")
         }
         
         // MARK: - Stepped Progress
@@ -270,7 +290,6 @@ extension UI {
                     .frame(maxWidth: .infinity)
                 }
             }
-            .accessibilityLabel("Step \(currentStep) of \(totalSteps)")
         }
         
         // MARK: - Order Tracking Progress
@@ -360,7 +379,6 @@ extension UI {
                     }
                 }
             }
-            .accessibilityLabel("Order tracking: Step \(currentStep) of \(totalSteps)")
         }
         
         // MARK: - Gradient Progress
@@ -404,22 +422,52 @@ extension UI {
                 .frame(height: height ?? theme.height)
             }
             .frame(width: width)
-            .accessibilityLabel("Progress")
-            .accessibilityValue("\(Int(value * 100)) percent")
         }
     }
 }
 
-// MARK: - Convenience Initializer
+// MARK: - Convenience Initializers (Default Theme)
 extension UI.ProgressBar where T == UIProgressTheme {
+    /// Convenience initializer using the default theme with separated data and style.
+    public init(
+        data: UIProgressData,
+        visualStyle: UIProgressVisualStyle,
+        theme: UIProgressTheme = .default,
+        accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
+    ) {
+        switch visualStyle {
+        case .linear:
+            self.style = .linear(value: data.value)
+        case .circular:
+            self.style = .circular(value: data.value)
+        case .gradient:
+            self.style = .gradient(value: data.value)
+        case .stepped(let config):
+            self.style = .stepped(currentStep: data.currentStep, totalSteps: data.totalSteps, labels: data.labels, config: config)
+        case .orderTracking(let config):
+            self.style = .orderTracking(currentStep: data.currentStep, totalSteps: data.totalSteps, labels: data.labels, config: config)
+        }
+        self.theme = theme
+        self.accessibility = accessibility
+        self.width = width
+        self.height = height
+    }
+    
+    /// Legacy convenience initializer using the default theme.
+    /// - Note: This initializer is deprecated. Use `init(data:visualStyle:)` instead.
+    @available(*, deprecated, message: "Use init(data:visualStyle:theme:) for better separation of concerns")
     public init(
         style: UIProgressBarStyle,
         theme: UIProgressTheme = .default,
+        accessibility: UIAccessibility? = nil,
         width: CGFloat? = nil,
         height: CGFloat? = nil
     ) {
         self.style = style
         self.theme = theme
+        self.accessibility = accessibility
         self.width = width
         self.height = height
     }
@@ -435,7 +483,8 @@ extension UI.ProgressBar where T == UIProgressTheme {
                     .font(.headline)
                 
                 UI.ProgressBar(
-                    style: .linear(value: 0.65),
+                    data: UIProgressData(value: 0.65),
+                    visualStyle: .linear,
                     theme: UIProgressTheme(showPercentage: true),
                     width: 300,
                     height: 15
@@ -452,12 +501,14 @@ extension UI.ProgressBar where T == UIProgressTheme {
                 
                 HStack(spacing: 40) {
                     UI.ProgressBar(
-                        style: .circular(value: 0.25),
+                        data: UIProgressData(value: 0.25),
+                        visualStyle: .circular,
                         theme: UIProgressTheme(height: 8, showPercentage: true)
                     )
                     
                     UI.ProgressBar(
-                        style: .circular(value: 0.65),
+                        data: UIProgressData(value: 0.65),
+                        visualStyle: .circular,
                         theme: UIProgressTheme(fillColor: .green, height: 30, showPercentage: true)
                     )
                 }
@@ -472,20 +523,21 @@ extension UI.ProgressBar where T == UIProgressTheme {
                     .font(.headline)
                 
                 UI.ProgressBar(
-                    style: .stepped(
+                    data: UIProgressData(
                         currentStep: 2,
                         totalSteps: 4,
                         labels: ["Order Placed", "Processing", "Shipped", "Delivered"]
-                    )
+                    ),
+                    visualStyle: .stepped()
                 )
                 
                 UI.ProgressBar(
-                    style: .stepped(
+                    data: UIProgressData(
                         currentStep: 2,
                         totalSteps: 4,
-                        labels: ["Small", "Tiny", "Dots", "End"],
-                        config: UISteppedProgressConfig(iconSize: 16, lineWidth: 1, spacing: 4)
-                    )
+                        labels: ["Small", "Tiny", "Dots", "End"]
+                    ),
+                    visualStyle: .stepped(config: UISteppedProgressConfig(iconSize: 16, lineWidth: 1, spacing: 4))
                 )
             }
             .padding()
@@ -498,19 +550,19 @@ extension UI.ProgressBar where T == UIProgressTheme {
                     .font(.headline)
                 
                 UI.ProgressBar(
-                    style: .orderTracking(
+                    data: UIProgressData(
                         currentStep: 2,
                         totalSteps: 4,
-                        labels: ["Ordered", "Packaged", "Shipped", "Delivered"],
-                        config: UIOrderTrackingConfig(
-                            iconSize: 60,
-                            lineWidth: 4,
-                            spacing: 24,
-                            icons: ["cart.fill", .default, .system("shippingbox.fill"), "house.fill"],
-                            subLabels: ["10:30 AM", "2:15 PM", "On Way", "Est. Tomorrow"],
-                            subLabelsFont: .body
-                        )
+                        labels: ["Ordered", "Packaged", "Shipped", "Delivered"]
                     ),
+                    visualStyle: .orderTracking(config: UIOrderTrackingConfig(
+                        iconSize: 60,
+                        lineWidth: 4,
+                        spacing: 24,
+                        icons: ["cart.fill", .default, .system("shippingbox.fill"), "house.fill"],
+                        subLabels: ["10:30 AM", "2:15 PM", "On Way", "Est. Tomorrow"],
+                        subLabelsFont: .body
+                    )),
                     theme: UIProgressTheme(fillColor: .orange)
                 )
             }
@@ -524,7 +576,8 @@ extension UI.ProgressBar where T == UIProgressTheme {
                     .font(.headline)
                 
                 UI.ProgressBar(
-                    style: .gradient(value: 0.75),
+                    data: UIProgressData(value: 0.75),
+                    visualStyle: .gradient,
                     theme: UIProgressTheme(fillColor: .cyan, showPercentage: true),
                     width: 250,
                     height: 50

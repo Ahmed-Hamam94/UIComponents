@@ -90,6 +90,8 @@ private struct RadioIcon<T: UIRadioButtonThemeProtocol>: View {
     let theme: T
     let size: CGFloat
     
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    
     var body: some View {
         ZStack {
             Circle()
@@ -107,7 +109,7 @@ private struct RadioIcon<T: UIRadioButtonThemeProtocol>: View {
                 )
                 .scaleEffect(isSelected ? 1.0 : 0.001)
         }
-        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
+        .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
     }
 }
 

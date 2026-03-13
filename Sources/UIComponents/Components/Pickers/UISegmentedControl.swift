@@ -51,6 +51,7 @@ extension UI {
         private let width: CGFloat?
         private let height: CGFloat?
 
+        @Environment(\.accessibilityReduceMotion) private var reduceMotion
         @Namespace private var namespace
 
         public init(
@@ -118,7 +119,7 @@ extension UI {
                         .frame(width: segmentWidth, height: effectiveHeight)
                         .offset(x: (segmentWidth + hStackSpacing) * CGFloat(selectedIndex))
                         .shadow(color: style == .pill ? Color.black.opacity(0.1) : .clear, radius: 4, x: 0, y: 2)
-                        .animation(.spring(response: 0.35, dampingFraction: 0.75), value: selection)
+                        .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.75), value: selection)
                 }
                 .frame(height: effectiveHeight)
                 

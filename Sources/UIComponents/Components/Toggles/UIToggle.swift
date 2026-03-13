@@ -87,16 +87,14 @@ private struct ToggleCapsule<T: UIToggleThemeProtocol>: View {
     let theme: T
     let size: CGFloat
     
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    
     private var trackWidth: CGFloat {
         (size / theme.trackHeight) * theme.trackWidth
     }
     
     var body: some View {
-        SwiftUI.Button(action: {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                isOn.toggle()
-            }
-        }) {
+        SwiftUI.Button(action: toggleState) {
             Capsule()
                 .fill(isOn ? theme.onColor : theme.offColor)
                 .frame(width: trackWidth, height: size)
@@ -109,6 +107,16 @@ private struct ToggleCapsule<T: UIToggleThemeProtocol>: View {
                 )
         }
         .buttonStyle(.plain)
+    }
+    
+    private func toggleState() {
+        if reduceMotion {
+            isOn.toggle()
+        } else {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                isOn.toggle()
+            }
+        }
     }
 }
 

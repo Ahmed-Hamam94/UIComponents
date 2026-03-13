@@ -83,6 +83,82 @@ extension UI.Button where S == UIButtonTheme {
     }
 }
 
+// MARK: - Environment-Aware Button
+
+extension UI {
+    /// A button that reads its theme from the environment.
+    ///
+    /// Use this variant when you want the button to automatically pick up
+    /// themes from the `.uiComponentsTheme()` modifier without explicit styling.
+    ///
+    /// ```swift
+    /// ContentView()
+    ///     .uiComponentsTheme(.dark)
+    ///
+    /// // Inside ContentView:
+    /// UI.EnvironmentButton(title: "Log In", variant: .primary) {
+    ///     print("Tapped")
+    /// }
+    /// ```
+    public struct EnvironmentButton: View {
+        /// The button style variant to use from the environment theme.
+        public enum Variant: Sendable {
+            case primary
+            case secondary
+            case destructive
+            case ghost
+            case link
+        }
+        
+        private let title: String
+        private let variant: Variant
+        private let accessibility: UIAccessibility?
+        private let width: CGFloat?
+        private let height: CGFloat?
+        private let action: () -> Void
+        
+        @Environment(\.uiComponentsTheme) private var theme
+        @Environment(\.isEnabled) private var isEnabled
+        
+        public init(
+            title: String,
+            variant: Variant = .primary,
+            accessibility: UIAccessibility? = nil,
+            width: CGFloat? = nil,
+            height: CGFloat? = nil,
+            action: @escaping () -> Void
+        ) {
+            self.title = title
+            self.variant = variant
+            self.accessibility = accessibility
+            self.width = width
+            self.height = height
+            self.action = action
+        }
+        
+        private var resolvedStyle: UIButtonTheme {
+            switch variant {
+            case .primary: theme.buttonPrimary
+            case .secondary: theme.buttonSecondary
+            case .destructive: theme.buttonDestructive
+            case .ghost: theme.buttonGhost
+            case .link: theme.buttonLink
+            }
+        }
+        
+        public var body: some View {
+            UI.Button(
+                title: title,
+                style: resolvedStyle,
+                accessibility: accessibility,
+                width: width,
+                height: height,
+                action: action
+            )
+        }
+    }
+}
+
 #Preview("Button Styles") {
     VStack(spacing: 20) {
         UI.Button(title: "Primary", style: .primary, action: {})

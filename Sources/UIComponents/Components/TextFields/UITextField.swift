@@ -21,7 +21,7 @@ extension UI {
     ///     errorMessage: error
     /// )
     /// ```
-    public struct TextField: View {
+    public struct TextField<T: UITextFieldThemeProtocol>: View {
         /// The text being edited.
         @Binding var text: String
         @FocusState private var isFocused: Bool
@@ -34,7 +34,7 @@ extension UI {
         /// Position of the icon relative to the text.
         private let imagePosition: ImagePosition
         /// Theme providing the colors and typography.
-        private let theme: UITextFieldThemeProtocol
+        private let theme: T
         /// Optional error message to display below the field.
         private let errorMessage: String?
         private let accessibility: UIAccessibility?
@@ -46,7 +46,7 @@ extension UI {
             placeholder: String,
             image: String? = nil,
             imagePosition: ImagePosition = .leading,
-            theme: UITextFieldThemeProtocol = UITextFieldTheme(),
+            theme: T,
             errorMessage: String? = nil,
             accessibility: UIAccessibility? = nil,
             width: CGFloat? = nil,
@@ -196,6 +196,33 @@ private struct ErrorLabel: View {
         Text(message)
             .font(.caption)
             .foregroundStyle(theme.errorTextColor)
+    }
+}
+
+// MARK: - Convenience Initializer with Default Theme
+extension UI.TextField where T == UITextFieldTheme {
+    /// Convenience initializer using the default `UITextFieldTheme`.
+    public init(
+        text: Binding<String>,
+        placeholder: String,
+        image: String? = nil,
+        imagePosition: ImagePosition = .leading,
+        errorMessage: String? = nil,
+        accessibility: UIAccessibility? = nil,
+        width: CGFloat? = nil,
+        height: CGFloat? = nil
+    ) {
+        self.init(
+            text: text,
+            placeholder: placeholder,
+            image: image,
+            imagePosition: imagePosition,
+            theme: UITextFieldTheme(),
+            errorMessage: errorMessage,
+            accessibility: accessibility,
+            width: width,
+            height: height
+        )
     }
 }
 
