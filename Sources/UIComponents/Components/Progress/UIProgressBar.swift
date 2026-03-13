@@ -77,25 +77,6 @@ extension UI {
             self.height = height
         }
         
-        // MARK: - Legacy Initializer (Deprecated)
-        
-        /// Creates a progress bar with combined style and data.
-        /// - Note: This initializer is deprecated. Use `init(data:visualStyle:theme:)` instead.
-        @available(*, deprecated, message: "Use init(data:visualStyle:theme:) for better separation of concerns")
-        public init(
-            style: UIProgressBarStyle,
-            theme: T,
-            accessibility: UIAccessibility? = nil,
-            width: CGFloat? = nil,
-            height: CGFloat? = nil
-        ) {
-            self.style = style
-            self.theme = theme
-            self.accessibility = accessibility
-            self.width = width
-            self.height = height
-        }
-        
         // Helper to extract normalized value (0-1) for animation
         private var targetValue: Double {
             switch style {
@@ -249,24 +230,36 @@ extension UI {
                                         .frame(width: geo.size.width / 2)
                                 }
                                 .frame(height: config.lineWidth)
-                                .offset(y: (config.iconSize / 2) - (config.lineWidth / 2))
+                                .offset(y: (config.circleSize / 2) - (config.lineWidth / 2))
                             }
-                            .frame(height: config.iconSize)
+                            .frame(height: config.circleSize)
                             
                             // Circle Icon
                             ZStack {
                                 Circle()
                                     .fill(step < currentStep ? theme.fillColor : theme.trackColor)
-                                    .frame(width: config.iconSize, height: config.iconSize)
+                                    .frame(width: config.circleSize, height: config.circleSize)
                                 
-                                if step < currentStep {
-                                    Image(systemName: "checkmark")
-                                        .font(.system(size: config.iconSize * 0.45, weight: .bold))
-                                        .foregroundStyle(.white)
+                                if let icons = config.icons, step < icons.count {
+                                    switch icons[step] {
+                                    case .system(let name):
+                                        Image(systemName: name)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: config.iconSize, height: config.iconSize)
+                                            .fontWeight(.semibold)
+                                            .foregroundStyle(step < currentStep ? .white : theme.textColor.opacity(0.5))
+                                    case .asset(let name):
+                                        Image(name)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: config.iconSize, height: config.iconSize)
+                                            .foregroundStyle(step < currentStep ? .white : theme.textColor.opacity(0.5))
+                                    case .default:
+                                        defaultStepIcon(step: step, currentStep: currentStep, iconSize: config.iconSize)
+                                    }
                                 } else {
-                                    Text("\(step + 1)")
-                                        .font(.system(size: config.iconSize * 0.4, weight: .bold))
-                                        .foregroundStyle(step == currentStep ? .white : theme.textColor.opacity(0.5))
+                                    defaultStepIcon(step: step, currentStep: currentStep, iconSize: config.iconSize)
                                 }
                             }
                             .overlay(
@@ -292,6 +285,23 @@ extension UI {
             }
         }
         
+        // MARK: - Default Step Icon Helper
+        @ViewBuilder
+        private func defaultStepIcon(step: Int, currentStep: Int, iconSize: CGFloat) -> some View {
+            if step < currentStep {
+                Image(systemName: "checkmark")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: iconSize, height: iconSize)
+                    .fontWeight(.bold)
+                    .foregroundStyle(.white)
+            } else {
+                Text("\(step + 1)")
+                    .font(.system(size: iconSize * 0.9, weight: .bold))
+                    .foregroundStyle(step == currentStep ? .white : theme.textColor.opacity(0.5))
+            }
+        }
+        
         // MARK: - Order Tracking Progress
         private func orderTrackingProgress(currentStep: Int, totalSteps: Int, labels: [String]?, config: UIOrderTrackingConfig) -> some View {
             VStack(alignment: .leading, spacing: config.spacing) {
@@ -303,39 +313,46 @@ extension UI {
                             ZStack {
                                 Circle()
                                     .fill(step < currentStep ? theme.fillColor : theme.trackColor)
-                                    .frame(width: config.iconSize, height: config.iconSize)
+                                    .frame(width: config.circleSize, height: config.circleSize)
                                 
                                 if let icons = config.icons, step < icons.count {
                                     switch icons[step] {
                                     case .system(let name):
                                         Image(systemName: name)
-                                            .font(.system(size: config.iconSize * 0.4, weight: .semibold))
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: config.iconSize, height: config.iconSize)
+                                            .fontWeight(.semibold)
                                             .foregroundStyle(step < currentStep ? .white : theme.textColor.opacity(0.5))
                                     case .asset(let name):
                                         Image(name)
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: config.iconSize * 0.45, height: config.iconSize * 0.45)
+                                            .frame(width: config.iconSize, height: config.iconSize)
                                             .foregroundStyle(step < currentStep ? .white : theme.textColor.opacity(0.5))
                                     case .default:
                                         if step < currentStep {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .font(.system(size: config.iconSize * 0.45))
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: config.iconSize, height: config.iconSize)
                                                 .foregroundStyle(.white)
                                         } else {
                                             Circle()
                                                 .fill(step == currentStep ? theme.fillColor.opacity(0.2) : .clear)
-                                                .frame(width: config.iconSize * 0.27, height: config.iconSize * 0.27)
+                                                .frame(width: config.circleSize * 0.27, height: config.circleSize * 0.27)
                                         }
                                     }
                                 } else if step < currentStep {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .font(.system(size: config.iconSize * 0.45))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: config.iconSize, height: config.iconSize)
                                         .foregroundStyle(.white)
                                 } else {
                                     Circle()
                                         .fill(step == currentStep ? theme.fillColor.opacity(0.2) : .clear)
-                                        .frame(width: config.iconSize * 0.27, height: config.iconSize * 0.27)
+                                        .frame(width: config.circleSize * 0.27, height: config.circleSize * 0.27)
                                 }
                             }
                             .overlay(
@@ -343,11 +360,12 @@ extension UI {
                                     .stroke(step == currentStep ? theme.fillColor : .clear, lineWidth: config.lineWidth * 1.5)
                                     .scaleEffect(1.15)
                             )
+                            .padding(.bottom, step == currentStep ? config.circleSize * 0.1 : 0)
                             .shadow(
                                 color: step == currentStep ? theme.fillColor.opacity(0.3) : .clear,
-                                radius: config.iconSize * 0.18,
+                                radius: config.circleSize * 0.18,
                                 x: 0,
-                                y: config.iconSize * 0.09
+                                y: config.circleSize * 0.09
                             )
                             
                             // Connecting line
@@ -355,10 +373,10 @@ extension UI {
                                 Rectangle()
                                     .fill(step < currentStep - 1 ? theme.fillColor : theme.trackColor)
                                     .frame(width: config.lineWidth)
-                                    .frame(height: config.iconSize * 0.9)
+                                    .frame(height: config.circleSize * 0.9)
                             }
                         }
-                        .alignmentGuide(VerticalAlignment.center) { d in config.iconSize / 2 }
+                        .alignmentGuide(VerticalAlignment.center) { d in config.circleSize / 2 }
                         
                         // Content
                         VStack(alignment: .leading, spacing: 4) {

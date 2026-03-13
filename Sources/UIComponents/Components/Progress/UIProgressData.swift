@@ -44,14 +44,26 @@ public struct UIProgressData: Sendable {
 
 /// Configuration for the stepped progress style.
 public struct UISteppedProgressConfig: Sendable {
+    /// The diameter of the step circle.
+    public let circleSize: CGFloat
+    /// The size of the icon inside the circle (in points).
     public let iconSize: CGFloat
     public let lineWidth: CGFloat
     public let spacing: CGFloat
+    public let icons: [UIProgressStepIcon]?
     
-    public init(iconSize: CGFloat = 32, lineWidth: CGFloat = 2, spacing: CGFloat = 8) {
-        self.iconSize = iconSize
+    public init(
+        circleSize: CGFloat = 32,
+        iconSize: CGFloat? = nil,
+        lineWidth: CGFloat = 2,
+        spacing: CGFloat = 8,
+        icons: [UIProgressStepIcon]? = nil
+    ) {
+        self.circleSize = circleSize
+        self.iconSize = iconSize ?? circleSize * 0.45
         self.lineWidth = lineWidth
         self.spacing = spacing
+        self.icons = icons
     }
     
     public static let `default` = UISteppedProgressConfig()
@@ -59,6 +71,9 @@ public struct UISteppedProgressConfig: Sendable {
 
 /// Configuration for the order tracking progress style.
 public struct UIOrderTrackingConfig: Sendable {
+    /// The diameter of the step circle.
+    public let circleSize: CGFloat
+    /// The size of the icon inside the circle (in points).
     public let iconSize: CGFloat
     public let lineWidth: CGFloat
     public let spacing: CGFloat
@@ -67,14 +82,16 @@ public struct UIOrderTrackingConfig: Sendable {
     public let subLabelsFont: Font?
     
     public init(
-        iconSize: CGFloat = 44,
+        circleSize: CGFloat = 44,
+        iconSize: CGFloat? = nil,
         lineWidth: CGFloat = 2,
         spacing: CGFloat = 16,
         icons: [UIProgressStepIcon]? = nil,
         subLabels: [String]? = nil,
         subLabelsFont: Font? = .caption
     ) {
-        self.iconSize = iconSize
+        self.circleSize = circleSize
+        self.iconSize = iconSize ?? circleSize * 0.4
         self.lineWidth = lineWidth
         self.spacing = spacing
         self.icons = icons
