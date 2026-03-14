@@ -90,6 +90,12 @@ public extension Country {
     static let egypt = Country(code: "EG", dialCode: "+20")
     static let uae = Country(code: "AE", dialCode: "+971")
     static let india = Country(code: "IN", dialCode: "+91")
+    static let canada = Country(code: "CA", dialCode: "+1")
+    static let germany = Country(code: "DE", dialCode: "+49")
+    static let france = Country(code: "FR", dialCode: "+33")
+    static let jordan = Country(code: "JO", dialCode: "+962")
+    static let kuwait = Country(code: "KW", dialCode: "+965")
+    static let qatar = Country(code: "QA", dialCode: "+974")
     
     /// A curated subset of frequently used countries.
     static let commonCountries: [Country] = [
@@ -98,6 +104,12 @@ public extension Country {
         .unitedKingdom,
         .egypt,
         .uae,
-        .india
+        .india,
+        .canada,
+        .germany,
+        .france,
+        .jordan,
+        .kuwait,
+        .qatar
     ]
 }
