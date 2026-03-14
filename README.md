@@ -93,11 +93,9 @@ Explore the full set of components available in the `UI` namespace.
 | `UI.Toggle` | Modern capsule switch with spring-driven animations. |
 
 #### Checkbox & Radio Button
-<p align="center">
-  <img src="/Users/ahmedhamam/.gemini/antigravity/brain/1be5956c-6823-45a5-b0c6-57e25f4a2009/checkbox_preview.png" alt="Checkbox Preview" width="200">
-  <img src="/Users/ahmedhamam/.gemini/antigravity/brain/1be5956c-6823-45a5-b0c6-57e25f4a2009/radio_button_preview.png" alt="Radio Button Preview" width="200">
-</p>
-
+[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Radio%20Button.png)
 ```swift
 // Checkbox usage
 UI.Checkbox(isOn: $isChecked, label: "Checkbox Label")
@@ -116,10 +114,8 @@ UI.RadioButton(id: 2, selection: $selection, label: "Success", theme: .success)
 | `UI.PhoneNumberTextField` | International phone input with a built-in country picker. |
 
 #### Validated TextField
-<p align="center">
-  <img src="/Users/ahmedhamam/.gemini/antigravity/brain/1be5956c-6823-45a5-b0c6-57e25f4a2009/validated_textfield_preview.png" alt="Validated TextField Preview" width="300">
-</p>
-
+[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Validated%20TextField.png)
 ```swift
 UI.ValidatedTextField(
     text: $email,
@@ -140,10 +136,12 @@ UI.ValidatedTextField(
 | `UI.Skeleton` | Premium shimmering loaders for content-heavy views. |
 
 #### Progress Bar
-<p align="center">
-  <img src="/Users/ahmedhamam/.gemini/antigravity/brain/1be5956c-6823-45a5-b0c6-57e25f4a2009/progress_bar_preview.png" alt="Progress Bar Preview" width="400">
-</p>
-
+[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar.png)
+[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar2.png)
+[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar3.png)
 ```swift
 // Linear Progress
 UI.ProgressBar(data: UIProgressData(value: 0.65), visualStyle: .linear)
@@ -168,10 +166,8 @@ UI.ProgressBar(
 | `.uiBottomSheet()` | Interactive, draggable sheets with optional handles. |
 
 #### Dialog
-<p align="center">
-  <img src="/Users/ahmedhamam/.gemini/antigravity/brain/1be5956c-6823-45a5-b0c6-57e25f4a2009/dialog_preview.png" alt="Dialog Preview" width="300">
-</p>
-
+[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Dialog.png)
 ```swift
 .uiDialog(
     isPresented: $showDialog,
