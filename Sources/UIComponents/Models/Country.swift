@@ -68,6 +68,22 @@ public struct Country: Identifiable, Equatable, Hashable, Sendable {
 
 // MARK: - Common Countries
 public extension Country {
+    /// Internal mapping of common ISO codes to their international dial codes.
+    private static let dialCodeMap: [String: String] = [
+        "SA": "+966", "US": "+1", "GB": "+44", "EG": "+20", "AE": "+971",
+        "IN": "+91", "CA": "+1", "DE": "+49", "FR": "+33", "IT": "+39",
+        "ES": "+34", "JP": "+81", "CN": "+86", "KR": "+82", "BR": "+55",
+        "MX": "+52", "AU": "+61", "RU": "+7", "ZA": "+27", "TR": "+90",
+        "KW": "+965", "QA": "+974", "BH": "+973", "OM": "+968", "JO": "+962",
+        "LB": "+961", "MA": "+212", "PK": "+92", "BD": "+880", "ID": "+62"
+    ]
+    
+    /// A comprehensive list of all supported countries, sorted alphabetically by localized name.
+    static var all: [Country] {
+        dialCodeMap.map { Country(code: $0.key, dialCode: $0.value) }
+            .sorted { $0.name < $1.name }
+    }
+    
     static let saudiArabia = Country(code: "SA", dialCode: "+966")
     static let unitedStates = Country(code: "US", dialCode: "+1")
     static let unitedKingdom = Country(code: "GB", dialCode: "+44")
@@ -75,6 +91,7 @@ public extension Country {
     static let uae = Country(code: "AE", dialCode: "+971")
     static let india = Country(code: "IN", dialCode: "+91")
     
+    /// A curated subset of frequently used countries.
     static let commonCountries: [Country] = [
         .saudiArabia,
         .unitedStates,
