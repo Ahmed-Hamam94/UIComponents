@@ -96,6 +96,7 @@ Explore the full set of components available in the `UI` namespace.
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)[
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Radio%20Button.png)
+
 ```swift
 // Checkbox usage
 UI.Checkbox(isOn: $isChecked, label: "Checkbox Label")
@@ -216,17 +217,9 @@ We believe accessibility isn't an "add-on".
 ---
 
 ## 🤝 Contributing
-
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Welcome contributions! If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request. Together, we can make UIComponents even better! 🚀
 
 ---
 
 ## 📄 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
