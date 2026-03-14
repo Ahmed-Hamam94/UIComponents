@@ -98,6 +98,18 @@ Explore the full set of components available in the `UI` namespace.
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Radio%20Button.png)
 
 ```swift
+// Standard Buttons
+UI.Button(title: "Save Changes", style: .primary) {
+    // Action
+}
+
+UI.ImageButton(title: "Scan", systemImage: "qrcode.viewfinder", style: .secondary) {
+    // Action
+}
+
+// Selection Toggles
+UI.Toggle(isOn: $isEnabled, label: "Notifications")
+
 // Checkbox usage
 UI.Checkbox(isOn: $isChecked, label: "Checkbox Label")
 UI.Checkbox(isOn: $isSecondary, label: "Secondary", theme: .secondary)
@@ -117,7 +129,10 @@ UI.RadioButton(id: 2, selection: $selection, label: "Success", theme: .success)
 #### Validated TextField
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Validated%20TextField.png)
-```swift
+// Themed TextField
+UI.TextField(text: $username, title: "Username", placeholder: "Enter username", image: "person")
+
+// Advanced Validation
 UI.ValidatedTextField(
     text: $email,
     isValid: $isEmailValid,
@@ -126,7 +141,10 @@ UI.ValidatedTextField(
     validationRules: [.required(), .email()],
     image: "envelope"
 )
-```
+
+// International Phone Picker
+UI.PhoneNumberTextField(phoneNumber: $phone, selectedCountry: $country)
+
 
 ### Progress & Displays
 | Component | Description |
@@ -143,21 +161,25 @@ UI.ValidatedTextField(
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar2.png)
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar3.png)
-```swift
-// Linear Progress
+// Progress Indicators
 UI.ProgressBar(data: UIProgressData(value: 0.65), visualStyle: .linear)
-
-// Circular Progress
 UI.ProgressBar(data: UIProgressData(value: 0.65), visualStyle: .circular)
 
-// Stepped Progress
-UI.ProgressBar(
-    data: UIProgressData(currentStep: 2, totalSteps: 4, labels: ["Cart", "Pay", "Ship", "Done"]),
-    visualStyle: .stepped(config: UISteppedProgressConfig(
-        icons: ["cart", "creditcard", "shippingbox", "checkmark.seal"]
-    ))
-)
-```
+// Status Badges
+UI.Badge("Active", theme: .success)
+UI.Badge("Pending", theme: .warning)
+
+// Elevated Content
+UI.Card {
+    VStack(alignment: .leading) {
+        Text("Order Summary").font(.headline)
+        Text("1x Espresso")
+    }
+}
+
+// Shimmering Loaders
+UI.Skeleton(width: 200, height: 20, cornerRadius: 4)
+
 
 ### Modals & Overlays (View Modifiers)
 | Modifier | Usage |
@@ -169,7 +191,7 @@ UI.ProgressBar(
 #### Dialog
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Dialog.png)
-```swift
+// Confirmation Dialogs
 .uiDialog(
     isPresented: $showDialog,
     title: "Session Expired",
@@ -177,7 +199,18 @@ UI.ProgressBar(
     primaryButton: "OK",
     primaryAction: { /* handle OK */ }
 )
-```
+
+// Toast Notifications
+.uiToast(isPresented: $showToast, message: "Changes Saved!", style: .success)
+
+// Bottom Sheets
+.uiBottomSheet(isPresented: $showSheet) {
+    VStack {
+        Text("Settings").font(.headline)
+        // ...
+    }
+}
+
 
 ---
 
