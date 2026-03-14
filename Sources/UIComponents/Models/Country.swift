@@ -27,6 +27,18 @@ public struct Country: Identifiable, Equatable, Hashable, Sendable {
         self.name = name
     }
     
+    /// Convenience initializer that generates the flag and localized name from an ISO country code.
+    /// - Parameters:
+    ///   - code: The ISO 3166-1 alpha-2 country code (e.g., "SA").
+    ///   - dialCode: The international dial code (e.g., "+966").
+    public init(code: String, dialCode: String) {
+        self.id = UUID()
+        self.code = code.uppercased()
+        self.dialCode = dialCode
+        self.flag = Self.flag(from: code)
+        self.name = Self.localizedName(from: code)
+    }
+    
     public static func == (lhs: Country, rhs: Country) -> Bool {
         lhs.code == rhs.code && lhs.dialCode == rhs.dialCode
     }
@@ -35,16 +47,33 @@ public struct Country: Identifiable, Equatable, Hashable, Sendable {
         hasher.combine(code)
         hasher.combine(dialCode)
     }
+    
+    // MARK: - Native Helpers
+    
+    /// Generates an emoji flag from an ISO country code.
+    private static func flag(from code: String) -> String {
+        let base: UInt32 = 127397
+        var s = ""
+        for v in code.uppercased().unicodeScalars {
+            s.unicodeScalars.append(UnicodeScalar(base + v.value)!)
+        }
+        return s
+    }
+    
+    /// Gets the localized country name from an ISO country code.
+    private static func localizedName(from code: String) -> String {
+        Locale.current.localizedString(forRegionCode: code) ?? code
+    }
 }
 
 // MARK: - Common Countries
 public extension Country {
-    static let saudiArabia = Country(code: "SA", flag: "🇸🇦", dialCode: "+966", name: "Saudi Arabia")
-    static let unitedStates = Country(code: "US", flag: "🇺🇸", dialCode: "+1", name: "United States")
-    static let unitedKingdom = Country(code: "GB", flag: "🇬🇧", dialCode: "+44", name: "United Kingdom")
-    static let egypt = Country(code: "EG", flag: "🇪🇬", dialCode: "+20", name: "Egypt")
-    static let uae = Country(code: "AE", flag: "🇦🇪", dialCode: "+971", name: "United Arab Emirates")
-    static let india = Country(code: "IN", flag: "🇮🇳", dialCode: "+91", name: "India")
+    static let saudiArabia = Country(code: "SA", dialCode: "+966")
+    static let unitedStates = Country(code: "US", dialCode: "+1")
+    static let unitedKingdom = Country(code: "GB", dialCode: "+44")
+    static let egypt = Country(code: "EG", dialCode: "+20")
+    static let uae = Country(code: "AE", dialCode: "+971")
+    static let india = Country(code: "IN", dialCode: "+91")
     
     static let commonCountries: [Country] = [
         .saudiArabia,

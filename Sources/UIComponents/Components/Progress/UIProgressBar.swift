@@ -574,9 +574,9 @@ extension UI.ProgressBar where T == UIProgressTheme {
                         labels: ["Ordered", "Packaged", "Shipped", "Delivered"]
                     ),
                     visualStyle: .orderTracking(config: UIOrderTrackingConfig(
-                        iconSize: 60,
-                        lineWidth: 4,
-                        spacing: 24,
+                        iconSize: 25,
+                        lineWidth: 2,
+                        spacing: 8,
                         icons: ["cart.fill", .default, .system("shippingbox.fill"), "house.fill"],
                         subLabels: ["10:30 AM", "2:15 PM", "On Way", "Est. Tomorrow"],
                         subLabelsFont: .body
