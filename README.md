@@ -96,6 +96,7 @@ Explore the full set of components available in the `UI` namespace.
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)[
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Radio%20Button.png)
+https://github.com/Ahmed-Hamam94/UIComponents/blob/551f52d318011d5b5b55dd3c67d9d085d79adc33/Assets/Button.png
 
 ```swift
 // Standard Buttons
