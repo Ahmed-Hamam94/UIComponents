@@ -92,10 +92,13 @@ Explore the full set of components available in the `UI` namespace.
 | `UI.RadioButton` | Sleek circular indicator for single-choice lists. |
 | `UI.Toggle` | Modern capsule switch with spring-driven animations. |
 
-#### Checkbox & Radio Button
+#### Buttons
 <p align="center">
-  <img src="Assets/Checkbox.png" width="45%">
-  <img src="Assets/Radio%20Button.png" width="45%">
+  <img src="Assets/Image Button.png width="35%">
+  <img src="Assets/Button.png" width="35%">
+  <img src="Assets/Checkbox.png" width="35%">
+  <img src="Assets/Radio%20Button.png" width="35%"> 
+  <img src="Assets/Toggle.png" width="35%">
 </p>
 
 ```swift
@@ -127,9 +130,13 @@ UI.RadioButton(id: 2, selection: $selection, label: "Success", theme: .success)
 | `UI.ValidatedTextField` | Advanced input with real-time validation and error feedback. |
 | `UI.PhoneNumberTextField` | International phone input with a built-in country picker. |
 
-#### Validated TextField
-![
-](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Validated%20TextField.png)
+####  TextFields
+<p align="center">
+  <img src="Assets/TextField.png" width="35%">
+  <img src="Assets/Validated%20TextField.png" width="35%">
+  <img src="Assets/Phone Number TextField.png" width="35%">
+</p>
+
 ```swift
 // Themed TextField
 UI.TextField(text: $username, title: "Username", placeholder: "Enter username", image: "person")
@@ -156,13 +163,17 @@ UI.PhoneNumberTextField(phoneNumber: $phone, selectedCountry: $country)
 | `UI.Card` | Elevated container for grouping related content. |
 | `UI.Skeleton` | Premium shimmering loaders for content-heavy views. |
 
-#### Progress Bar
-![
-](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar.png)
-![
-](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar2.png)
-![
-](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar3.png)
+#### Progress Bar / Badge / Card / Skeleton
+<p align="center">
+  <img src="Assets/Progress Bar.png" width="35%">
+  <img src="Assets/Progress Bar2.png" width="35%">
+  <img src="Assets/Progress Bar3.png" width="35%">
+</p> 
+<p align="center">
+  <img src="Assets/Skeleton.png" width="35%">
+</p>
+
+
 ```swift
 // Progress Indicators
 UI.ProgressBar(data: UIProgressData(value: 0.65), visualStyle: .linear)
@@ -192,8 +203,15 @@ UI.Skeleton(width: 200, height: 20, cornerRadius: 4)
 | `.uiBottomSheet()` | Interactive, draggable sheets with optional handles. |
 
 #### Dialog
-![
-](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Dialog.png)
+<p align="center">
+  <img src="Assets/Dialog.png" width="35%">
+  <img src="Assets/Toast.png" width="35%">
+  <img src="Assets/Toast2.png" width="35%">
+</p> 
+<p align="center">
+  <img src="Assets/Bottom Sheet.png" width="35%">
+</p> 
+
 ```swift
 // Confirmation Dialogs
 .uiDialog(
