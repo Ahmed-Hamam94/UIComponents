@@ -94,11 +94,11 @@ Explore the full set of components available in the `UI` namespace.
 
 #### Buttons
 <p align="center">
-  <img src="Assets/Image Button.png width="35%">
-  <img src="Assets/Button.png" width="35%">
-  <img src="Assets/Checkbox.png" width="35%">
-  <img src="Assets/Radio%20Button.png" width="35%"> 
-  <img src="Assets/Toggle.png" width="35%">
+  <img src="Assets/Image Button.png" width="25%">
+  <img src="Assets/Button.png" width="25%">
+  <img src="Assets/Checkbox.png" width="25%">
+  <img src="Assets/Radio%20Button.png" width="25%"> 
+  <img src="Assets/Toggle.png" width="25%">
 </p>
 
 ```swift
@@ -132,9 +132,9 @@ UI.RadioButton(id: 2, selection: $selection, label: "Success", theme: .success)
 
 ####  TextFields
 <p align="center">
-  <img src="Assets/TextField.png" width="35%">
-  <img src="Assets/Validated%20TextField.png" width="35%">
-  <img src="Assets/Phone Number TextField.png" width="35%">
+  <img src="Assets/TextField.png" width="25%">
+  <img src="Assets/Validated%20TextField.png" width="25%">
+  <img src="Assets/Phone Number TextField.png" width="25%">
 </p>
 
 ```swift
@@ -165,14 +165,11 @@ UI.PhoneNumberTextField(phoneNumber: $phone, selectedCountry: $country)
 
 #### Progress Bar / Badge / Card / Skeleton
 <p align="center">
-  <img src="Assets/Progress Bar.png" width="35%">
-  <img src="Assets/Progress Bar2.png" width="35%">
-  <img src="Assets/Progress Bar3.png" width="35%">
+  <img src="Assets/Progress Bar.png" width="25%">
+  <img src="Assets/Progress Bar2.png" width="25%">
+  <img src="Assets/Progress Bar3.png" width="25%">
+  <img src="Assets/Skeleton.png" width="25%">
 </p> 
-<p align="center">
-  <img src="Assets/Skeleton.png" width="35%">
-</p>
-
 
 ```swift
 // Progress Indicators
@@ -204,12 +201,10 @@ UI.Skeleton(width: 200, height: 20, cornerRadius: 4)
 
 #### Dialog
 <p align="center">
-  <img src="Assets/Dialog.png" width="35%">
-  <img src="Assets/Toast.png" width="35%">
-  <img src="Assets/Toast2.png" width="35%">
-</p> 
-<p align="center">
-  <img src="Assets/Bottom Sheet.png" width="35%">
+  <img src="Assets/Dialog.png" width="25%">
+  <img src="Assets/Toast.png" width="25%">
+  <img src="Assets/Toast2.png" width="25%">
+  <img src="Assets/Bottom Sheet.png" width="25%">
 </p> 
 
 ```swift
