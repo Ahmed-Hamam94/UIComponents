@@ -93,8 +93,8 @@ Explore the full set of components available in the `UI` namespace.
 | `UI.Toggle` | Modern capsule switch with spring-driven animations. |
 
 #### Checkbox & Radio Button
-[ (https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)
-][
+[
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)[
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Radio%20Button.png)
 
 ```swift
