@@ -93,8 +93,9 @@ Explore the full set of components available in the `UI` namespace.
 | `UI.Toggle` | Modern capsule switch with spring-driven animations. |
 
 #### Checkbox & Radio Button
-[
-](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)[
+![
+](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)
+![
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Radio%20Button.png)
 
 ```swift
@@ -127,7 +128,7 @@ UI.RadioButton(id: 2, selection: $selection, label: "Success", theme: .success)
 | `UI.PhoneNumberTextField` | International phone input with a built-in country picker. |
 
 #### Validated TextField
-[
+![
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Validated%20TextField.png)
 ```swift
 // Themed TextField
@@ -156,11 +157,11 @@ UI.PhoneNumberTextField(phoneNumber: $phone, selectedCountry: $country)
 | `UI.Skeleton` | Premium shimmering loaders for content-heavy views. |
 
 #### Progress Bar
-[
+![
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar.png)
-[
+![
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar2.png)
-[
+![
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar3.png)
 ```swift
 // Progress Indicators
@@ -191,7 +192,7 @@ UI.Skeleton(width: 200, height: 20, cornerRadius: 4)
 | `.uiBottomSheet()` | Interactive, draggable sheets with optional handles. |
 
 #### Dialog
-[
+![
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Dialog.png)
 ```swift
 // Confirmation Dialogs
