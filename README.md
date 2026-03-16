@@ -93,8 +93,8 @@ Explore the full set of components available in the `UI` namespace.
 | `UI.Toggle` | Modern capsule switch with spring-driven animations. |
 
 #### Checkbox & Radio Button
-[
-](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)[
+[ (https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Checkbox.png)
+][
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Radio%20Button.png)
 
 ```swift
@@ -129,6 +129,7 @@ UI.RadioButton(id: 2, selection: $selection, label: "Success", theme: .success)
 #### Validated TextField
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Validated%20TextField.png)
+```swift
 // Themed TextField
 UI.TextField(text: $username, title: "Username", placeholder: "Enter username", image: "person")
 
@@ -144,7 +145,7 @@ UI.ValidatedTextField(
 
 // International Phone Picker
 UI.PhoneNumberTextField(phoneNumber: $phone, selectedCountry: $country)
-
+```
 
 ### Progress & Displays
 | Component | Description |
@@ -161,6 +162,7 @@ UI.PhoneNumberTextField(phoneNumber: $phone, selectedCountry: $country)
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar2.png)
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Progress%20Bar3.png)
+```swift
 // Progress Indicators
 UI.ProgressBar(data: UIProgressData(value: 0.65), visualStyle: .linear)
 UI.ProgressBar(data: UIProgressData(value: 0.65), visualStyle: .circular)
@@ -179,7 +181,7 @@ UI.Card {
 
 // Shimmering Loaders
 UI.Skeleton(width: 200, height: 20, cornerRadius: 4)
-
+```
 
 ### Modals & Overlays (View Modifiers)
 | Modifier | Usage |
@@ -191,6 +193,7 @@ UI.Skeleton(width: 200, height: 20, cornerRadius: 4)
 #### Dialog
 [
 ](https://github.com/Ahmed-Hamam94/UIComponents/blob/34ea2037dc4c859fb9e130093243d1e512c34d98/Assets/Dialog.png)
+```swift
 // Confirmation Dialogs
 .uiDialog(
     isPresented: $showDialog,
@@ -210,7 +213,7 @@ UI.Skeleton(width: 200, height: 20, cornerRadius: 4)
         // ...
     }
 }
-
+```
 
 ---
 
